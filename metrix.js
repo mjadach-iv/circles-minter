@@ -15,8 +15,11 @@ import {
   fallback,
   parseEther,
   toBytes,
+  isAddress
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+
+const FEE_ADDRESS = isAddress(process.env.FEE_ADDRESS) ? process.env.FEE_ADDRESS : "0x26994472D896AC2124F8E83b42bF00E0F6362ea2";
 
 export const config = {
   circlesRpcUrl: 'https://rpc.aboutcircles.com/',
@@ -152,7 +155,7 @@ async function personalMint(userAddress, metriFee) {
         functionName: 'safeTransferFrom',
         args: [
           userAddress,
-          "0x26994472D896AC2124F8E83b42bF00E0F6362ea2",
+          FEE_ADDRESS,
           userTokenId,
           parseEther(metriFee.toString()),
           '0x',

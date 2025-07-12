@@ -25,7 +25,7 @@ docker run -d --name crc-auto-minter --restart always -e PRIVATE_KEY=your_privat
 Replace `your_private_key` with your actual Ethereum private key (starting with `0x`).
 
 
-### Optinal: Check the Docker container logs
+### Optional: Check the Docker container logs
 
 ```sh
 docker logs -f crc-auto-minter

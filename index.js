@@ -75,7 +75,7 @@ async function mint() {
         if (mintable > 0n) {
             const normalFee = 0.0833288 * 3 * mintable;
             const fee = Number((normalFee/2).toFixed(10));
-            console.log(`If you minted with metri the fee would be ${normalFee} CRC, but you only will pay 50% of that: ${fee} CRC`);
+            console.log(`If you minted with metri the fee would be ${normalFee} CRC, but you will save ${fee} CRC on this minting!`);
             const rez = await metrixMint(avatar.address, fee);
             console.log(`Minting successful for '${profile.name}': https://gnosisscan.io/tx/${rez}`);
         } else {
