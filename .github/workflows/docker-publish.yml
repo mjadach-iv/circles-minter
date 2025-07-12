@@ -1,10 +1,12 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker image tag (e.g. 1.0.0)'
+        required: true
+        default: '0.0.0'
 
 jobs:
   build-and-push:
@@ -27,4 +29,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/crc-auto-minter:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/crc-auto-minter:${{ github.event.inputs.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/crc-auto-minter:latest
