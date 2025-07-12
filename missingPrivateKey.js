@@ -24,7 +24,7 @@ export async function privateKeyCheck() {
 
 
 export async function missingPrivateKey() {
-    console.error('You did not provide a valid PRIVATE_KEY as environment variable.');
+    console.error('\nYou did not provide a valid PRIVATE_KEY as environment variable.');
     console.log('If you don\'t have or know how to generate a new a private key, you can use the following automatically generated one just for you:\n');
 
     // Generate a random private key
