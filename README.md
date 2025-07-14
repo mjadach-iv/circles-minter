@@ -87,7 +87,7 @@
 
 2. **Build the project bundle:**
    ```sh
-   npm run build:bundle:cjs
+   npm run build:bundle
    ```
 
 3. **Build the binary executable:**

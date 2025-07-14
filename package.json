@@ -6,8 +6,7 @@
   "license": "All rights reserved",
   "type": "module",
   "scripts": {
-    "build:bundle:mjs": "npx webpack --config webpack.config.mjs",
-    "build:bundle:cjs": "npx webpack --config webpack.config.js",
+    "build:bundle": "npx webpack --config webpack.config.js",
     "build:binary": "sh ./scripts/build-sea.sh"
   },
   "repository": {
