@@ -11,9 +11,9 @@ COPY package*.json ./
 RUN npm install --production
 
 # Copy the rest of the app
-COPY index.js ./
-COPY metrix.js ./
-COPY missingPrivateKey.js ./
+COPY src/index.js ./
+COPY src/metrix.js ./
+COPY src/missingPrivateKey.js ./
 
 # Set environment variable for production
 ENV NODE_ENV=production

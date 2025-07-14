@@ -1,3 +1,10 @@
+import sea from 'node:sea';
+
+if (sea.isSea()) {
+  const { createRequire } = require('node:module');
+  require = createRequire(__filename);
+}
+
 import { Sdk } from '@circles-sdk/sdk';
 import { ethers } from 'ethers';
 import { mint as metrixMint, config as chainConfig } from './metrix.js';
@@ -11,7 +18,7 @@ async function main() {
     await privateKeyCheck();
 
     console.log('Starting Circles minting process...');
-    
+
     while (true) {
         try {
             await mint();
