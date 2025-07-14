@@ -1,0 +1,9 @@
+{
+  "main": "./dist/bundle/bundle.cjs",
+  "output": "./dist/binary/crc-auto-minter.blob",
+  "disableExperimentalSEAWarning": true,
+  "useCodeCache": true,
+  "assets": {
+    "721.bundle.js": "./dist/bundle/721.bundle.cjs"
+  }
+}

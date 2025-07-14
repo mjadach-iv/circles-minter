@@ -4,7 +4,7 @@ import { privateKeyToAccount, generatePrivateKey  } from 'viem/accounts';
 export async function privateKeyCheck() {
     const PRIVATE_KEY = process.env.PRIVATE_KEY;
     let isValid = true;
-    
+
     if (!isHex(PRIVATE_KEY)) {
         isValid = false; // Reset to null if invalid;
     }
@@ -37,7 +37,7 @@ export async function missingPrivateKey() {
     console.log('Owner address:', account.address);
 
     console.log('\nYou need to add the new owner address to the Metri application in the settings and then re-run this program while providing the PRIVATE_KEY environment variable.');
-    console.log('\nIMPORTANT: Save the private key in a secure place, so no one else can access it. If you lose it, can still access your account using the passkey you used to crete your Metri account.');
+    console.log('\nIMPORTANT: Save the private key in a secure place, so no one else can access it. If you lose it, can still access your account using the passkey you used to crete your Metri account.\n\n');
 
     // Sleep for 1 year (365 days)
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));

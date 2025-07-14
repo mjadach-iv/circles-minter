@@ -1,9 +1,9 @@
 # CRC (Circles) Auto Minter
 
 ### Save on the Metri fees, inviter fees, and group fees
- 
 
-## Project description 
+
+## Project description
 - The script automatically mints Circles tokens every 24 hours for all accounts associated with your provided private key.
 - Minting is fully sponsored - your owner wallet does not need any funds for gas fees.
 - Metri fees, inviter fees, and group fees (which make a total of 25% of the minted amount that you lose) will not be deducted from your account. Instead, half of the original fees will be directed to the creator of this script.
@@ -15,44 +15,86 @@
 
 1. [Download an image using Docker](#download-an-image-using-docker)
 2. [Build a Docker image on your own](#build-a-docker-image-on-your-own)
+3. [Build a binary on your own](#build-a-binary-on-your-own)
 
 
 ## Download an image using Docker
-Set your private key as an environment variable when running the container:
 
-```sh
-docker run -d --name crc-auto-minter --restart always -e PRIVATE_KEY=your_private_key 0xmj/crc-auto-minter:latest
-```
+### Requirements
 
-Replace `your_private_key` with your actual Ethereum private key (starting with `0x`).
+- **Docker** must be installed if you want to build or run the Docker image.
 
-### Optional: Check the Docker container logs
+### Step-by-step Instructions
 
-```sh
-docker logs -f crc-auto-minter
-```
+1. **Set your private key as an environment variable when running the container:**
+
+    ```sh
+    docker run -d --name crc-auto-minter --restart always -e PRIVATE_KEY=your_private_key 0xmj/crc-auto-minter:latest
+    ```
+
+    Replace `your_private_key` with your actual Ethereum private key (starting with `0x`).
+
+2. Optional: Check the Docker container logs
+
+    ```sh
+    docker logs -f crc-auto-minter
+    ```
 
 ## Build a Docker image on your own
 
-### Build the Docker image
+### Requirements
 
-```sh
-docker build -t crc-auto-minter .
-```
+- **Docker** must be installed if you want to build or run the Docker image.
 
-### 2. Run the Docker container
+### Step-by-step Instructions
 
-Set your private key as an environment variable when running the container:
+1. **Build the Docker image**
 
-```sh
-docker run -d --name crc-auto-minter --restart always -e PRIVATE_KEY=your_private_key crc-auto-minter
-```
+    ```sh
+    docker build -t crc-auto-minter .
+    ```
 
-Replace `your_private_key` with your actual Ethereum private key (starting with `0x`).
+2. **Run the Docker container**
+
+    Set your private key as an environment variable when running the container:
+
+    ```sh
+    docker run -d --name crc-auto-minter --restart always -e PRIVATE_KEY=your_private_key crc-auto-minter
+    ```
+
+    Replace `your_private_key` with your actual Ethereum private key (starting with `0x`).
 
 
-### Optional: Check the Docker container logs
+3. **Optional**: Check the Docker container logs
 
-```sh
-docker logs -f crc-auto-minter
-```
+    ```sh
+    docker logs -f crc-auto-minter
+    ```
+
+
+## Build a Binary (Standalone Executable)
+
+### Requirements
+
+- **Node.js 22** (or newer) must be installed on your system to build the binary. You do not need Node.js to run the resulting binary.
+
+### Step-by-step Instructions
+
+1. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+
+2. **Build the project bundle:**
+   ```sh
+   npm run build:bundle:cjs
+   ```
+
+3. **Build the binary executable:**
+   ```sh
+   npm run build:binary
+   ```
+
+The resulting binary will be located in the `./dist/binary` directory.
+
+The binary is self-contained and does not require Node.js to be installed on the target machine.
