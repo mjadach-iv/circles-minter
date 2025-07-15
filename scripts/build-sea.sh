@@ -1,19 +1,23 @@
+
 #!/bin/bash
+
+VERSION=$(node -p "require('./package.json').version")
 
 mkdir ./dist/binary
 node --experimental-sea-config sea-config.json
+
 
 OS_TYPE=$(uname -s)
 OUTFILE=""
 case "$OS_TYPE" in
     Linux*)
-        OUTFILE="crc-auto-minter-linux"
+        OUTFILE="crc-auto-minter-linux-$VERSION"
         node -e "require('fs').copyFileSync(process.execPath, './dist/binary/$OUTFILE')"
         npx postject ./dist/binary/$OUTFILE NODE_SEA_BLOB ./dist/binary/crc-auto-minter.blob \
             --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
         ;;
     Darwin*)
-        OUTFILE="crc-auto-minter-macos"
+        OUTFILE="crc-auto-minter-macos-$VERSION"
         node -e "require('fs').copyFileSync(process.execPath, './dist/binary/$OUTFILE')"
         codesign --remove-signature ./dist/binary/$OUTFILE
         npx postject ./dist/binary/$OUTFILE NODE_SEA_BLOB ./dist/binary/crc-auto-minter.blob \
@@ -22,7 +26,7 @@ case "$OS_TYPE" in
         codesign --sign - ./dist/binary/$OUTFILE
         ;;
     CYGWIN*|MINGW*|MSYS*)
-        OUTFILE="crc-auto-minter-win.exe"
+        OUTFILE="crc-auto-minter-win-$VERSION.exe"
         node -e "require('fs').copyFileSync(process.execPath, './dist/binary/$OUTFILE')"
         # signtool remove /s $OUTFILE
         npx postject ./dist/binary/$OUTFILE NODE_SEA_BLOB ./dist/binary/crc-auto-minter.blob \
