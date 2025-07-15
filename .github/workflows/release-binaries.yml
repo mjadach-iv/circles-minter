@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-large]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,6 +63,12 @@ jobs:
           name: binary-macos-latest
           path: ./binaries/macos
 
+      - name: Download macOS Intel binary
+        uses: actions/download-artifact@v4
+        with:
+          name: binary-macos-15-large
+          path: ./binaries/macos
+
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -71,26 +77,11 @@ jobs:
           name: Release ${{ github.event.inputs.tag }}
           draft: false
           prerelease: false
+          files: |
+            ./binaries/windows/*
+            ./binaries/macos/*
+            ./binaries/linux/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Linux binary to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./binaries/linux/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Windows binary to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./binaries/windows/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload macOS binary to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./binaries/macos/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

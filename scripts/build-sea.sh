@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 VERSION=$(node -p "require('./package.json').version")
@@ -17,7 +16,8 @@ case "$OS_TYPE" in
             --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
         ;;
     Darwin*)
-        OUTFILE="crc-auto-minter-macos-$VERSION"
+        ARCH=$(uname -m)
+        OUTFILE="crc-auto-minter-macos-$ARCH-$VERSION"
         node -e "require('fs').copyFileSync(process.execPath, './dist/binary/$OUTFILE')"
         codesign --remove-signature ./dist/binary/$OUTFILE
         npx postject ./dist/binary/$OUTFILE NODE_SEA_BLOB ./dist/binary/crc-auto-minter.blob \
