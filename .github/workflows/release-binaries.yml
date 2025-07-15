@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-large]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -61,12 +61,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: binary-macos-latest
-          path: ./binaries/macos
-
-      - name: Download macOS Intel binary
-        uses: actions/download-artifact@v4
-        with:
-          name: binary-macos-15-large
           path: ./binaries/macos
 
       - name: Create GitHub Release
