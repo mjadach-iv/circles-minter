@@ -14,6 +14,7 @@ RUN npm install --production
 COPY src/index.js ./
 COPY src/metrix.js ./
 COPY src/missingPrivateKey.js ./
+COPY .env ./
 
 # Set environment variable for production
 ENV NODE_ENV=production

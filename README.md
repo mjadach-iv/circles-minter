@@ -45,16 +45,23 @@
 ### Requirements
 
 - **Docker** must be installed if you want to build or run the Docker image.
+- [cometh.io](https://cometh.io/) API keys
 
 ### Step-by-step Instructions
 
-1. **Build the Docker image**
+1. **Fill in the required variables in .env file**
+   ```sh
+    PUBLIC_CONNECT_4337_COMETH_API_KEY=
+    PUBLIC_COMETH_API_KEY=
+   ```
+
+2. **Build the Docker image**
 
     ```sh
     docker build -t crc-auto-minter .
     ```
 
-2. **Run the Docker container**
+3. **Run the Docker container**
 
     Set your private key as an environment variable when running the container:
 
@@ -77,6 +84,7 @@
 ### Requirements
 
 - **Node.js 22** (or newer) must be installed on your system to build the binary. You do not need Node.js to run the resulting binary.
+- [cometh.io](https://cometh.io/) API keys
 
 ### Step-by-step Instructions
 
@@ -85,12 +93,18 @@
    npm install
    ```
 
-2. **Build the project bundle:**
+2. **Fill in the required variables in .env file**
+   ```sh
+    PUBLIC_CONNECT_4337_COMETH_API_KEY=
+    PUBLIC_COMETH_API_KEY=
+   ```
+
+3. **Build the project bundle:**
    ```sh
    npm run build:bundle
    ```
 
-3. **Build the binary executable:**
+4. **Build the binary executable:**
    ```sh
    npm run build:binary
    ```
