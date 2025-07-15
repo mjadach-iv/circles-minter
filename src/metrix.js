@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { gnosis } from 'viem/chains';
 import {
   createComethPaymasterClient,
@@ -19,7 +20,6 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
-const FEE_ADDRESS = isAddress(process.env.FEE_ADDRESS) ? process.env.FEE_ADDRESS : "0x26994472D896AC2124F8E83b42bF00E0F6362ea2";
 
 export const config = {
   circlesRpcUrl: 'https://rpc.aboutcircles.com/',
@@ -32,13 +32,10 @@ export const config = {
   baseGroupMintPolicy: '0xcCa27c26CF7BAC2a9928f42201d48220F0e3a549',
 };
 
-const PUBLIC_CONNECT_4337_COMETH_API_KEY = "7eDL9dMQVUYR3F6iH7k2uG22MSCgztqW";
-const PUBLIC_COMETH_API_KEY = "84772bd4-ff0c-4bad-aba2-00cbfe7dc8e7";
-
-const GATEWAY_KEY = 'Oom6oPr0YAFTCJKY3TjE5emsM2WPHYNv.qaMPgkvfbYmueYav';
-export const RPC_URL_GATEWAY = `https://rpc.eu-central-2.gateway.fm/v4/gnosis/non-archival/mainnet?apiKey=${GATEWAY_KEY}`;
-const ANKR_PROJECT_ID = '94fe44f8aa83c72ea822888f5214fc34bbcd3e247aae275b0622742222c1de5b';
-export const RPC_URL_ANKR = `https://rpc.ankr.com/gnosis/${ANKR_PROJECT_ID}`
+const PUBLIC_CONNECT_4337_COMETH_API_KEY = process.env.PUBLIC_CONNECT_4337_COMETH_API_KEY;
+const PUBLIC_COMETH_API_KEY = process.env.PUBLIC_COMETH_API_KEY;
+export const RPC_URL_GATEWAY =  process.env.RPC_URL_GATEWAY || '';
+export const RPC_URL_ANKR = process.env.RPC_URL_ANKR || '';
 export const RPC_URL_CIRCLES = config.circlesRpcUrl;
 export const RPC_URL_GNOSIS = 'https://rpc.gnosischain.com/';
 
@@ -155,7 +152,7 @@ async function personalMint(userAddress, metriFee) {
         functionName: 'safeTransferFrom',
         args: [
           userAddress,
-          FEE_ADDRESS,
+          "0xf6f2A96CE7EabF3E00fDdF2bA0c4789623680046", // CRC Auto Mint group owner address
           userTokenId,
           parseEther(metriFee.toString()),
           '0x',

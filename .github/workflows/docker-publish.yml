@@ -9,7 +9,7 @@ on:
         default: '0.0.0'
 
 jobs:
-  build-and-push:
+  build-and-push-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,8 +24,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Create .env file from secrets
+        run: |
+          cat <<EOF > .env
+          RPC_URL_GATEWAY=${{ secrets.RPC_URL_GATEWAY }}
+          RPC_URL_ANKR=${{ secrets.RPC_URL_ANKR }}
+          PUBLIC_CONNECT_4337_COMETH_API_KEY=${{ secrets.PUBLIC_CONNECT_4337_COMETH_API_KEY }}
+          PUBLIC_COMETH_API_KEY=${{ secrets.PUBLIC_COMETH_API_KEY }}
+          CRC_AUTO_MINT_GROUP_BE_KEY=${{ secrets.CRC_AUTO_MINT_GROUP_BE_KEY }}
+          EOF
+
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true

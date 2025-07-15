@@ -1,13 +1,13 @@
 # CRC (Circles) Auto Minter
 
-### Save on the Metri fees, inviter fees, and group fees
+### Save on the Metri fees, inviter fees, and group fees and never again miss minting your CRC
 
 
 ## Project description
 - The script automatically mints Circles tokens every 24 hours for all accounts associated with your provided private key.
 - Minting is fully sponsored - your owner wallet does not need any funds for gas fees.
-- Metri fees, inviter fees, and group fees (which make a total of 25% of the minted amount that you lose) will not be deducted from your account. Instead, half of the original fees will be directed to the creator of this script.
-- Code is open source, it is built directly on GitHub for full transparency, or you can also build it yourself.
+- Metri fees, inviter fees, and group fees (which make a total of 25% of the minted amount that you lose) will not be deducted from your account. Instead, half of the original fees will be directed to the CRC Auto Mint safe.
+- Code is open source, and the docker image is built directly on GitHub for full transparency, or you can also build it yourself.
 - If you are unfamiliar with creating or providing a private key, this program may not be suitable for you. However, if you proceed without supplying a private key, the script will securely generate one for you and display it on first run.
 
 
