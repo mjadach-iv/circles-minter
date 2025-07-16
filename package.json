@@ -1,7 +1,7 @@
 {
   "name": "crc-auto-minter",
   "version": "0.0.4",
-  "description": "",
+  "author": "Michal Jadach",
   "main": "index.js",
   "license": "All rights reserved",
   "type": "module",
@@ -13,7 +13,6 @@
     "type": "git",
     "url": "git+https://github.com/mjadach-iv/crc-auto-minter.git"
   },
-  "author": "",
   "bugs": {
     "url": "https://github.com/mjadach-iv/crc-auto-minter/issues"
   },

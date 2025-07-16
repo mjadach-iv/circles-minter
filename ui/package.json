@@ -1,0 +1,24 @@
+{
+  "name": "ui",
+  "version": "1.0.0",
+  "main": "main/index.js",
+  "type": "module",
+  "scripts": {
+    "electron": "NODE_ENV=development electron-forge start",
+    "electron:dev": "NODE_ENV=development electronmon .",
+    "start": "concurrently \"npm run build:watch\" \"npm run electron:dev\" \"npm run react\"",
+    "react": "cd renderer && npm run start"
+  },
+  "keywords": [],
+  "author": "Michal Jadach",
+  "license": "All rights reserved",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "electron": "^37.2.2",
+    "electronmon": "^2.0.3"
+  },
+  "dependencies": {
+
+  }
+}
