@@ -104,6 +104,7 @@ export default defineConfig([
       "no-unused-vars": "off",
       "unused-imports/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "warn",
+      "react/jsx-one-expression-per-line": "warn",
 
       "@typescript-eslint/no-unused-vars": [
         "warn",

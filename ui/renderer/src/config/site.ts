@@ -1,6 +1,32 @@
-export type SiteConfig = typeof siteConfig;
+export type siteConfig = {
+  name: string;
+  description: string;
+  navItems: {
+    label: string;
+    href: string;
+  }[];
+  navMenuItems: {
+    label: string;
+    href: string;
+    color:
+      | "primary"
+      | "foreground"
+      | "danger"
+      | "secondary"
+      | "success"
+      | "warning"
+      | undefined;
+  }[];
+  links: {
+    github: string;
+    twitter: string;
+    docs: string;
+    discord: string;
+    sponsor: string;
+  };
+};
 
-export const siteConfig = {
+export const siteConfig: siteConfig = {
   name: "Vite + HeroUI",
   description: "Make beautiful websites regardless of your design experience.",
   navItems: [
@@ -27,36 +53,19 @@ export const siteConfig = {
   ],
   navMenuItems: [
     {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
       label: "Dashboard",
-      href: "/dashboard",
+      href: "/",
+      color: "primary",
     },
     {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
+      label: "Accounts",
+      href: "/accounts",
+      color: "foreground",
     },
     {
       label: "Logout",
       href: "/logout",
+      color: "danger",
     },
   ],
   links: {
