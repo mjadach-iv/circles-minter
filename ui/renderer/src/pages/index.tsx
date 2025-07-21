@@ -7,10 +7,19 @@ import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
 import DefaultLayout from "@/layouts/default";
+import { useStore } from "@/store";
 
 export default function IndexPage() {
+  
+  const loadDB = useStore((state) => state.loadDB);
+
   return (
     <DefaultLayout>
+      <button
+        onClick={()=>{loadDB()}}
+      >
+        sssss
+      </button>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
           <span className={title()}>Make&nbsp;</span>

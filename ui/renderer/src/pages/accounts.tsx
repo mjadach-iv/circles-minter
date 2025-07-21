@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Button } from "@heroui/react";
 import { RiFolderAddFill } from "react-icons/ri";
 import { title } from "@/components/primitives";
@@ -28,10 +28,9 @@ export default function DocsPage() {
           accountsArray.map((account, index) => {
             return (
               <Card
-                key={index}
+                key={`accountsArray-${index}`}
                 index={index}
                 name={account.name}
-                privateKey={account.privateKey}
                 publicKey={account.publicKey}
               />
             );

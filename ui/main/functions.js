@@ -12,14 +12,14 @@ export function encryptJson(json, password) {
     const cipher = crypto.createCipheriv(algorithm, crypto.scryptSync(secretTMP, 'salt', 32), iv);
     let encrypted = cipher.update(JSON.stringify(json), 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
+    return '1:' + iv.toString('hex') + ':' + encrypted;
 }
 
 // Decrypt
 export function decryptJson(encrypted, password) {
     const passwordProtect = !!password;
     const secretTMP = secret + (passwordProtect ? password : '');
-    const [ivHex, encryptedData] = encrypted.split(':');
+    const [version, ivHex, encryptedData] = encrypted.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const decipher = crypto.createDecipheriv(algorithm, crypto.scryptSync(secretTMP, 'salt', 32), iv);
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
@@ -37,4 +37,9 @@ export function testSecret(encrypted, password) {
     } catch (e) {
         return false;
     }
+}
+
+export function generateSecret() {
+    const randomString = crypto.randomBytes(16).toString('hex'); // 32 hex chars
+    return randomString; // Return the newly generated secret
 }

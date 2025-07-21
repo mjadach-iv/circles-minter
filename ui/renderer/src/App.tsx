@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
+import { useStore } from "./store";
 
 import IndexPage from "@/pages/index";
 import DocsPage from "@/pages/accounts";
@@ -7,6 +9,15 @@ import BlogPage from "@/pages/blog";
 import AboutPage from "@/pages/about";
 
 function App() {
+
+ // const getUiSecret = useStore((state) => state.getUiSecret);
+  const loadDB = useStore((state) => state.loadDB);
+
+  useEffect(() => {
+    // getUiSecret();
+    loadDB();
+  }, [])
+
   return (
     <Routes>
       <Route element={<IndexPage />} path="/" />

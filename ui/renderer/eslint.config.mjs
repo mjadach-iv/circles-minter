@@ -101,7 +101,8 @@ export default defineConfig([
       "jsx-a11y/click-events-have-key-events": "warn",
       "jsx-a11y/interactive-supports-focus": "warn",
       "prettier/prettier": "warn",
-      "no-unused-vars": "off",
+      "no-unused-vars": "off", // disables 'declared but its value is never read.'
+      "@typescript-eslint/no-unused-vars": "off", // disables for TS as well
       "unused-imports/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "warn",
       "react/jsx-one-expression-per-line": "warn",

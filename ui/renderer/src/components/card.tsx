@@ -5,7 +5,7 @@ import {
     CardFooter,
     Divider,
     Link,
-    Image,
+//    Image,
     Button
 } from "@heroui/react";
 import { FaTrashAlt } from "react-icons/fa";
@@ -15,7 +15,6 @@ import type { Address } from "@/types";
 
 type Props = {
     name: string;
-    privateKey: Address;
     publicKey: Address;
     index: number;
 };
