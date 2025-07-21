@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { Button } from "@heroui/react";
 import { RiFolderAddFill } from "react-icons/ri";
-
 import { title } from "@/components/primitives";
 import Card from "@/components/card";
 import DefaultLayout from "@/layouts/default";
 import AddAccount from "@/components/addAccount";
+import { useStore } from "@/store";
 
 export default function DocsPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const accountsArray = useStore((state) => state.accounts);
 
   return (
     <DefaultLayout>
@@ -19,12 +20,24 @@ export default function DocsPage() {
       </section>
 
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <Card
-          name="Accounts"
-          privateKey="your-private-key"
-          publicKey="0xcd2a3d9f938e13cd947ec0i8um67fe734df8d8861"
-        />
+        {
+          accountsArray.length === 0 &&
+          <p className="text-default-500">No accounts added yet.</p>
+        }
+        {
+          accountsArray.map((account, index) => {
+            return (
+              <Card
+                key={index}
+                index={index}
+                name={account.name}
+                privateKey={account.privateKey}
+                publicKey={account.publicKey}
+              />
+            );
+          })}
       </section>
+
 
       <AddAccount
         isOpen={isAddAccountOpen}
@@ -44,6 +57,6 @@ export default function DocsPage() {
       >
         <RiFolderAddFill className="text-default-500 size-12" />
       </Button>
-    </DefaultLayout>
+    </DefaultLayout >
   );
 }

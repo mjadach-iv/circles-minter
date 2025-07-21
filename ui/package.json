@@ -6,8 +6,8 @@
   "scripts": {
     "electron": "NODE_ENV=development electron-forge start",
     "electron:dev": "NODE_ENV=development electronmon .",
-    "start": "concurrently \"npm run build:watch\" \"npm run electron:dev\" \"npm run react\"",
-    "react": "cd renderer && npm run start"
+    "start": "concurrently \"npm run electron:dev\" \"npm run react\"",
+    "react": "cd renderer && npm run dev"
   },
   "keywords": [],
   "author": "Michal Jadach",
@@ -16,9 +16,11 @@
   "devDependencies": {
     "concurrently": "^9.2.0",
     "electron": "^37.2.2",
+    "electron-forge": "^5.2.4",
     "electronmon": "^2.0.3"
   },
   "dependencies": {
-
+    "dotenv": "^17.2.0",
+    "electron-store": "^10.1.0"
   }
 }

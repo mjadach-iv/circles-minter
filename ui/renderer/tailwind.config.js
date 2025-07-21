@@ -10,7 +10,16 @@ export default {
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'xs': '45rem',
+        'sm': '9999rem',
+        'md': '9999rem',
+        'lg': '9999rem',
+        'xl': '9999rem',
+        '2xl': '9999rem'
+      },
+    },
   },
   darkMode: "class",
   plugins: [heroui()],
