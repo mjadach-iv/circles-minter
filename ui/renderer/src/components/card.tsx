@@ -5,13 +5,13 @@ import {
     CardFooter,
     Divider,
     Link,
-//    Image,
+    Image,
     Button
 } from "@heroui/react";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { useStore } from "@/store";
-import type { Address } from "@/types";
+import { useStore } from "../store";
+import type { Address } from "../types";
 
 type Props = {
     name: string;
@@ -72,7 +72,7 @@ export default function CardComponent(props: Props) {
                             <p className="text-sm text-default-500">Circles accounts:</p>
                             <ul>
                                 {profilesOfTheOwner?.map((profile) => (
-                                    <li 
+                                    <li
                                         key={profile.address}
                                         style={{
                                             listStyle: 'disc',

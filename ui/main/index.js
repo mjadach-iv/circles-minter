@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import Store from 'electron-store';
-import { decryptJson, encryptJson, generateSecret } from './functions.js';
+import { decryptJson, encryptJson, generateSecret, decryptString } from './functions.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -104,11 +104,10 @@ app.whenReady().then(() => {
 
 const store = new Store();
 function registerIpcHandlers() {
-    ipcMain.handle('get-db', (event) => {
+    ipcMain.handle('get-db', async (event) => {
         try {
             const db = store.get('db');
             const json = db ? decryptJson(db) : null;
-            console.log('DB:', json);
             return json;
         } catch (error) {
             console.error('Error getting DB:', error);

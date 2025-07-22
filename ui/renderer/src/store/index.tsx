@@ -3,10 +3,10 @@ import { devtools } from 'zustand/middleware';
 import SafeApiKit from '@safe-global/api-kit';
 import { Sdk, type Avatar } from '@circles-sdk/sdk';
 import { ethers } from 'ethers';
-import { config as chainConfig } from '../config';
+import { config as chainConfig } from '../config/constants';
 import { privateKeyToAccount } from 'viem/accounts';
-import { type Address } from '@/types/index';
-import {encryptString} from '@/crypto'
+import { type Address } from '../types/index';
+import {encryptString} from '../crypto'
 
 // Extend the Window interface to include electronAPI
 declare global {
@@ -44,8 +44,6 @@ type Account = {
 }
 
 interface StoreState {
-    uiSecret: string;
-    getUiSecret: ()=>{};
     accounts: Account[];
     addAccount: (name: string, privateKey: Address) => void;
     removeAccount: (index: number) => void;
@@ -59,15 +57,6 @@ interface StoreState {
 
 export const useStore = create<StoreState>()(
     devtools((set, get) => ({
-        // uiSecret: '',
-        // getUiSecret: async () => {
-        //     const uiSecret = await window.electronAPI.getUiSecret();
-        //     console.log('UI Secret', uiSecret)
-        //     set(() => ({ 
-        //         uiSecret
-        //     }), false, 'getUiSecret');
-        //     return uiSecret;
-        // },
         accounts: [],
         profiles: {},
         addAccount: async (name: string, privateKey: Address) => {

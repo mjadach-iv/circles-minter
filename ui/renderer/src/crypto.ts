@@ -58,7 +58,6 @@ export async function encryptString(input: string, secret: string): Promise<stri
 
 // Decrypt
 export async function decryptString(encrypted: string, secret: string): Promise<string> {
-  //@ts-expect-error For now we will not use the version
   const [version, ivHex, encryptedData] = encrypted.split(':');
   const iv = new Uint8Array(hex2ab(ivHex));
   const key = await deriveKey(secret);

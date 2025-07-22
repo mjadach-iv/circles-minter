@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import {
+    useState,
+    useEffect
+} from "react";
 import {
     Modal,
     ModalContent,
@@ -9,10 +12,13 @@ import {
     Input,
     Tooltip
 } from "@heroui/react";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import {
+    generatePrivateKey,
+    privateKeyToAccount
+} from "viem/accounts";
 import { FaEye, FaEyeSlash, FaRegCopy } from "react-icons/fa";
-import { useStore } from "@/store";
-import type { Address } from "@/types";
+import { useStore } from "../store";
+import type { Address } from "../types";
 
 type Props = {
     isOpen: boolean;
@@ -20,17 +26,17 @@ type Props = {
 };
 
 const copyToClipboard = async (text: string) => {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (err) {
-    // fallback for older browsers
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-  }
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (err) {
+        // fallback for older browsers
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+    }
 };
 
 export default function AddAccount(props: Props) {
@@ -41,7 +47,7 @@ export default function AddAccount(props: Props) {
     const [alreadyAddedError, setAlreadyAddedError] = useState(false);
     const [visibility, setVisibility] = useState(false);
     const accounts = useStore((state) => state.accounts);
-    const alreadyAddedPublicKeys = accounts.map(account => account.publicKey);  
+    const alreadyAddedPublicKeys = accounts.map(account => account.publicKey);
     const nextAccount = accounts.length + 1;
     const addAccountToStore = useStore((state) => state.addAccount);
 
@@ -56,7 +62,7 @@ export default function AddAccount(props: Props) {
             setPublicAddress(account.address);
             setError(false);
 
-            if(alreadyAddedPublicKeys.includes(account.address as Address)) {
+            if (alreadyAddedPublicKeys.includes(account.address as Address)) {
                 setAlreadyAddedError(true);
             } else {
                 setAlreadyAddedError(false);
@@ -89,8 +95,8 @@ export default function AddAccount(props: Props) {
 
     return (
         <>
-            <Modal 
-                isOpen={props.isOpen} 
+            <Modal
+                isOpen={props.isOpen}
                 onOpenChange={props.onOpenChange}
                 placement="top-center"
             >
@@ -130,8 +136,8 @@ export default function AddAccount(props: Props) {
                                         aria-label="toggle password visibility"
                                         className="focus:outline-hidden mr-2"
                                         type="button"
-                                        onClick={()=>{
-                                            setVisibility((curr)=>!curr);
+                                        onClick={() => {
+                                            setVisibility((curr) => !curr);
                                         }}
                                     >
                                         {visibility ? (
@@ -144,7 +150,7 @@ export default function AddAccount(props: Props) {
                                         aria-label="toggle password visibility"
                                         className="focus:outline-hidden"
                                         type="button"
-                                        onClick={()=>{
+                                        onClick={() => {
                                             copyToClipboard(privateKey);
                                         }}
                                     >
@@ -164,13 +170,13 @@ export default function AddAccount(props: Props) {
                             label="Public address (derived from the private key)"
                             type="text"
                             value={publicAddress}
-                             endContent={
+                            endContent={
                                 <>
                                     <button
                                         aria-label="copy"
                                         className="focus:outline-hidden"
                                         type="button"
-                                        onClick={()=>{
+                                        onClick={() => {
                                             copyToClipboard(publicAddress);
                                         }}
                                     >
@@ -203,11 +209,11 @@ export default function AddAccount(props: Props) {
                         </Button>
                         {
                             (error || alreadyAddedError) ?
-                                <Tooltip 
+                                <Tooltip
                                     content={
                                         alreadyAddedError ?
-                                        "You already added this account" :
-                                        "You need to provide a correct private key"
+                                            "You already added this account" :
+                                            "You need to provide a correct private key"
                                     }
                                 >
                                     <Button

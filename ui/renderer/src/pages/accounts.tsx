@@ -1,11 +1,11 @@
 import  { useState } from "react";
 import { Button } from "@heroui/react";
 import { RiFolderAddFill } from "react-icons/ri";
-import { title } from "@/components/primitives";
-import Card from "@/components/card";
-import DefaultLayout from "@/layouts/default";
-import AddAccount from "@/components/addAccount";
-import { useStore } from "@/store";
+import { title } from "../components/primitives";
+import Card from "../components/card";
+import DefaultLayout from "../layouts/default";
+import AddAccount from "../components/addAccount";
+import { useStore } from "../store";
 
 export default function DocsPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
@@ -34,7 +34,8 @@ export default function DocsPage() {
                 publicKey={account.publicKey}
               />
             );
-          })}
+          })
+        }
       </section>
 
 
