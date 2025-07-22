@@ -63,8 +63,8 @@ export const siteConfig: siteConfig = {
       color: "foreground",
     },
     {
-      label: "Logout",
-      href: "/logout",
+      label: "Settings",
+      href: "/settings",
       color: "danger",
     },
   ],
