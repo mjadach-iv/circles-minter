@@ -45,12 +45,21 @@ type Account = {
 
 interface StoreState {
     accounts: Account[];
+    balances: {
+        [ownerAddress: Address]: {
+            value: string | null;
+            isFetching: boolean;
+        };
+    };
+    minting: boolean;
+    automaticMinting: boolean;
     addAccount: (name: string, privateKey: Address) => void;
     removeAccount: (index: number) => void;
     fetchMetriSafes: (owner: Address) => Promise<void>;
     profiles: {
         [ownerAddress: Address]: Profile[];
     };
+    getTotalBalance: (ownerAddress: Address) => Promise<void>;
     loadDB: ()=>{},
 }
 
@@ -59,6 +68,9 @@ export const useStore = create<StoreState>()(
     devtools((set, get) => ({
         accounts: [],
         profiles: {},
+        balances: {},
+        minting: false,
+        automaticMinting: false,
         addAccount: async (name: string, privateKey: Address) => {
             const account = privateKeyToAccount(privateKey as Address);
             const uiSecret = await window.electronAPI.getUiSecret();
@@ -106,10 +118,49 @@ export const useStore = create<StoreState>()(
                 set(() => ({ 
                     accounts: db.accounts
                 }), false, 'loadAccounts');
+
+                for (const account of db.accounts) {
+                    const profiles = await getProfiles(account.publicKey);
+                    set((state) => ({
+                        profiles: {
+                            ...state.profiles,
+                            [account.publicKey]: profiles
+                        }
+                    }), false, 'loadProfiles');
+                }
+
             } catch (error) {
                 console.error('Error loading database:', error);
             }
         },
+        getTotalBalance: async (ownerAddress: Address) => {
+            set((state) => ({ 
+                balances: {
+                    ...state.balances,
+                    [ownerAddress]: {
+                        value: state.balances?.[ownerAddress]?.value || null,
+                        isFetching: true
+                    }
+                }
+            }), false, 'setTotalBalance');
+           const rez = await fetch(chainConfig.circlesRpcUrl, {
+                "headers": {
+                    "content-type": "application/json",
+                },
+                "body": `{\"jsonrpc\":\"2.0\",\"id\":${Math.random()},\"method\":\"circlesV2_getTotalBalance\",\"params\":[\"${ownerAddress}\",true]}`,
+                "method": "POST",
+            });
+            const json = await rez.json();
+            console.log(`Total balance for ${ownerAddress}:`, json);
+            set((state) => ({ 
+                balances: {
+                    ...state.balances,
+                    [ownerAddress]: {
+                        value: json?.result || null,
+                        isFetching: false
+                    }
+            }}), false, 'setTotalBalance');
+        }
     }))
 );
 
@@ -129,13 +180,25 @@ async function getProfiles(ownerAddress: Address): Promise<Profile[]> {
         }
     }
 
-    const profiles: { name: string, address: Address }[] = [];
+    const profiles: { 
+        name: string, 
+        address: Address,
+        description?: string,
+        image?: string
+     }[] = [];
 
     for (const avatar of avatars) {
-        const profile = await avatar.getProfile()
+        const profile = await avatar.getProfile();
+         await avatar.getTotalBalance()
+        console.log(`Profile for avatar ${avatar.address}:`, profile);
         if (profile) {
             console.log(`Avatar found: ${profile.name}, address: ${avatar.address}`);
-            profiles.push({ address: avatar.address as Address, name: profile.name });
+            profiles.push({
+                address: avatar.address as Address,
+                name: profile.name,
+                description: profile?.description,
+                image: profile?.previewImageUrl,
+            });
         }
     }
 

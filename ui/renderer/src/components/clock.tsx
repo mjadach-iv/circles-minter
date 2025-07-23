@@ -13,17 +13,20 @@ const SEGMENTS = [
     [1, 1, 1, 0, 0, 0, 0], // 7
     [1, 1, 1, 1, 1, 1, 1], // 8
     [1, 1, 1, 1, 0, 1, 1], // 9
+    [0, 0, 0, 0, 0, 0, 0], // nothing
 ];
 
 function Digit({ n }: { n: number }) {
     const on = (i: number) => SEGMENTS[n][i] ? 'orange' : '#222';
     return (
-        <svg 
-            width={48} 
-            height={85} 
+        <svg
+            width={48}
+            height={85}
             viewBox="3 4 50 88"
             style={{
                 margin: '0 3px',
+                width: 'caclc( 48 / 338 * 100% )',
+                height: 'caclc( 48 / 338 * 100% )',
             }}
         >
             {/* a */}
@@ -54,25 +57,83 @@ function Colon() {
     );
 }
 
-export default function Clock(countdownTo?: Date) {
-    const [time, setTime] = useState(() => new Date());
+type ClockProps = {
+    countdownTo?: Date;
+    minting?: boolean;
+};
+
+export default function Clock(props: ClockProps) {
+    const [on, setOn] = useState(false);
+
+    // Clock code
+    // useEffect(() => {
+    //     const id = setInterval(() => setTime(new Date()), 1000);
+    //     return () => clearInterval(id);
+    // }, []);
+    // const h = time.getHours().toString().padStart(2, '0');
+    // const m = time.getMinutes().toString().padStart(2, '0');
+    // const s = time.getSeconds().toString().padStart(2, '0');
+
+    // Countdown logic
+    const [timeLeft, setTimeLeft] = useState(() => {
+        const now = new Date();
+        const nextHour = new Date(now);
+        nextHour.setHours(now.getMinutes() === 0 && now.getSeconds() === 0 ? now.getHours() : now.getHours() + 1, 0, 0, 0);
+        const diff = nextHour.getTime() - now.getTime();
+        return diff > 0 ? diff : 0;
+    });
     useEffect(() => {
-        const id = setInterval(() => setTime(new Date()), 1000);
+        const id = setInterval(() => {
+            const now = new Date();
+            const nextHour = new Date(now);
+            nextHour.setHours(now.getMinutes() === 0 && now.getSeconds() === 0 ? now.getHours() : now.getHours() + 1, 0, 0, 0);
+            const countdownTo = props.countdownTo || nextHour;
+            const diff = countdownTo.getTime() - now.getTime();
+            setTimeLeft(diff > 0 ? diff : 0);
+        }, 1000);
         return () => clearInterval(id);
-    }, []);
-    const h = time.getHours().toString().padStart(2, '0');
-    const m = time.getMinutes().toString().padStart(2, '0');
-    const s = time.getSeconds().toString().padStart(2, '0');
+    }, [props.countdownTo]);
+
+    // Convert ms to hh:mm:ss
+    const totalSeconds = Math.floor(timeLeft / 1000);
+    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+
+    useEffect(() => {
+        let m: NodeJS.Timeout | undefined;
+        if (props.minting) {
+            m = setInterval(() => { setOn((state) => !state) }, 1000);
+        }
+        return () => clearInterval(m);
+    }, [props.minting]);
+
     return (
-        <div style={{ display: 'flex', alignItems: 'center', background: '#111', padding: 16, borderRadius: 8, width: 'fit-content', margin: 'auto' }}>
-            <Digit n={+h[0]} />
-            <Digit n={+h[1]} />
-            <Colon />
-            <Digit n={+m[0]} />
-            <Digit n={+m[1]} />
-            <Colon />
-            <Digit n={+s[0]} />
-            <Digit n={+s[1]} />
+        <div style={{ display: 'flex', alignItems: 'center', background: '#111', padding: 8, borderRadius: 8, width: '330px', margin: 'auto' }}>
+            {
+                props.minting ?
+                <>
+                    <Digit n={on ? 8 : 10} />
+                    <Digit n={on ? 8 : 10} />
+                    <Colon />
+                    <Digit n={on ? 8 : 10} />
+                    <Digit n={on ? 8 : 10} />
+                    <Colon />
+                    <Digit n={on ? 8 : 10} />
+                    <Digit n={on ? 8 : 10} />
+                </>
+                :
+                <>
+                    <Digit n={+h[0]} />
+                    <Digit n={+h[1]} />
+                    <Colon />
+                    <Digit n={+m[0]} />
+                    <Digit n={+m[1]} />
+                    <Colon />
+                    <Digit n={+s[0]} />
+                    <Digit n={+s[1]} />
+                </>
+            }
         </div>
     );
 }
