@@ -92,7 +92,7 @@ function createWindow() {
     } else {
         // and load the index.html of the app.
         mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
-        mainWindow.webContents.openDevTools();
+     //   mainWindow.webContents.openDevTools();
     }
 
 }

@@ -103,10 +103,16 @@ export const useStore = create<StoreState>()(
 
         },
         removeAccount: (index: number) => {
+            const ownerAddress = get().accounts[index].publicKey;
             set((state) => ({ accounts: state.accounts.filter((_, i) => i !== index) }), false, 'removeAccount');
             window.electronAPI.saveDb({
                 accounts: get().accounts,
             });
+            set((state) => {
+                const newProfiles = { ...state.profiles };
+                delete newProfiles[ownerAddress];
+                return { profiles: newProfiles };
+            }, false, 'removeProfiles');
         },
         loadDB: async () => {
             try{
