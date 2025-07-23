@@ -1,16 +1,27 @@
 import { Button } from "@heroui/react";
+import {CircularProgress} from "@heroui/react";
 import DefaultLayout from "../layouts/default";
 import Clock from "../components/clock";
 import AccountCard from "../components/cardAccount";
 import { useStore } from "../store";
 import { Link } from "react-router-dom";
+import { type Address } from "../types";
 
 export default function IndexPage() {
-  const minting = useStore((state) => state.minting);
   const automaticMinting = useStore((state) => state.automaticMinting);
-  const { profiles } = useStore();
+  const { profiles, loadingApp, minting } = useStore();
   const profilesOwners = Object.keys(profiles);
-  const thereAreProfiles = profilesOwners.length > 0;
+
+  const areThereProfiles = () => {
+    for (const ownerAddress of profilesOwners) {
+      const profilesOfOwner = profiles[ownerAddress];
+      if (profilesOfOwner && profilesOfOwner.length > 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+  const thereAreProfiles = areThereProfiles();
 
   return (
     <DefaultLayout>
@@ -18,21 +29,33 @@ export default function IndexPage() {
         <p 
           className='text-lg mb-2'
           style={{ width: '100%', maxWidth: '500px', margin: 'calc(var(--spacing) * 2) auto' }}
-        >{
-          minting ?
-            'Minting...'
-            :
-            automaticMinting
-              ?
-              'Time till next mint:'
+        >
+          {
+            minting ?
+              'Minting...'
               :
-              'New CRC in:'}
+              automaticMinting
+                ?
+                'Time till next mint:'
+                :
+                'New CRC in:'
+          }
         </p>
 
         <Clock
           minting={minting}
         />
         {
+          loadingApp ? (
+            <div
+              className="flex flex-col items-center justify-center"
+              style={{ width: '100%', maxWidth: '500px', margin: '64px auto 8px' }}
+            >
+              <CircularProgress aria-label="Loading..." size="lg" />
+              <p className="text-default-500 text-center mt-8">Loading...</p>
+            </div>
+          )
+          :
           thereAreProfiles ?
           <>
             <div
@@ -56,16 +79,16 @@ export default function IndexPage() {
             <div
               className="flex flex-col items-center justify-center"
             >
-               <p className="text-default-500 text-center mt-20">No profiles found.</p>
+              <p className="text-default-500 text-center mt-20">No accounts found.</p>
               <Link
-                to="/accounts"
+                to="/accounts?add=true"
                 className="text-default-500 text-center mt-2"
               >
                 <Button
                   size="md"
                   className="mt-4"
                 >
-                  Add a profile
+                  Add an account
                 </Button>
               </Link>
             </div>
@@ -84,9 +107,8 @@ function Accounts() {
     <div className="accounts-list flex flex-row flex-wrap justify-center gap-4 ">
       {
         profilesOwners.map((ownerAddress) => {
-          console.log('Owner Address:', ownerAddress);
           const ownerProfiles = profiles[ownerAddress];
-          return ownerProfiles.map((profile) => {
+          return ownerProfiles.map((profile: { address: Address; description: string; name: string; image: string; }) => {
             return (
               <AccountCard
                 key={`AccountCard-${profile.address}`}

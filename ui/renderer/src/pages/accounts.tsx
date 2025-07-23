@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import  { useEffect, useState } from "react";
 import { Button } from "@heroui/react";
 import { RiFolderAddFill } from "react-icons/ri";
 import { title } from "../components/primitives";
@@ -6,10 +6,23 @@ import Card from "../components/card";
 import DefaultLayout from "../layouts/default";
 import AddAccount from "../components/addAccount";
 import { useStore } from "../store";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function DocsPage() {
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const accountsArray = useStore((state) => state.accounts);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = new URLSearchParams(location.search);
+  const foo = params.get('add');
+
+  useEffect(() => {
+    if (foo) {
+      setIsAddAccountOpen(true);
+      // Remove search params from URL after opening modal
+      navigate(location.pathname, { replace: true });
+    }
+  }, [foo, location.pathname, navigate]);
 
   return (
     <DefaultLayout>

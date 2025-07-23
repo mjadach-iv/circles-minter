@@ -98,11 +98,19 @@ export default function AddAccount(props: Props) {
             <Modal
                 isOpen={props.isOpen}
                 onOpenChange={props.onOpenChange}
-                placement="top-center"
+                placement="center"
+                scrollBehavior="inside"
+                isDismissable={false}
             >
                 <ModalContent>
                     <ModalHeader className="flex flex-col gap-1">Add account</ModalHeader>
-                    <ModalBody>
+                    <ModalBody
+                        className="always-scrollbar"
+                        style={{
+                            marginRight: "8px",
+                            paddingRight: "16px",
+                        }}
+                    >
                         <p>
                             In order to use automatic minting, you need to add to your Metri
                             (or Circle) account a new owner account. Each owner account

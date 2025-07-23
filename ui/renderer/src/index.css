@@ -2,3 +2,21 @@
  @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
  @custom-variant dark (&:is(.dark *));
  @config "../tailwind.config.js";
+
+
+html {
+    user-select: none;
+}
+
+.always-scrollbar {
+  overflow-y: scroll;
+  /* Always show scrollbar on Webkit browsers (Chrome, Safari, Electron) */
+  &::-webkit-scrollbar {
+    width: 8px;
+    /* background: #8c8c8c; */
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #8c8c8c;
+    border-radius: 4px;
+  }
+}

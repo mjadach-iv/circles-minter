@@ -14,10 +14,15 @@ export default function AccountCard({ address, name, description, image }: Props
   const getTotalBalance = useStore((state) => state.getTotalBalance);
   const balances = useStore((state) => state.balances);
   const balanceFetch = balances[address]?.isFetching
-  const totalBalance = balances[address]?.value;
+  const totalBalance = balances[address]?.balance;
+  const mintable = balances[address]?.mintable || 0;
 
   useEffect(() => {
     getTotalBalance(address);
+    const interval = setInterval(() => {
+      getTotalBalance(address);
+    }, 60 * 60 * 1000); // every hour
+    return () => clearInterval(interval);
   }, [address, getTotalBalance]);
 
   return (
@@ -72,7 +77,16 @@ export default function AccountCard({ address, name, description, image }: Props
               {description}
             </p>
             <p className="text-md text-default-700 mt-4">
-              { balanceFetch ? "Fetching balance..." : totalBalance === null ? "No balance available" : `${parseFloat(totalBalance).toFixed(2)} CRC` }
+              { balanceFetch ? "Fetching balance..." : typeof totalBalance === "number" ? `${totalBalance.toFixed(2)} CRC` : "No balance available" } 
+              <span   
+                style={{
+                  marginLeft: "8px",
+                  fontSize: "14px",
+                  fontWeight: 800,
+                  color: "orange"
+                }}>
+                { !balanceFetch && typeof mintable === "number"  ? `(+${mintable.toFixed(2)})` : "" }
+              </span>
             </p>
           </div>
         </div>

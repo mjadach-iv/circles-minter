@@ -19,7 +19,7 @@ function App() {
     <Routes>
       <Route element={<IndexPage />} path="/" />
       <Route element={<AccountsPage />} path="/accounts" />
-      <Route element={<AccountsPage />} path="/settings" />
+      <Route element={<SettingsPage />} path="/settings" />
     </Routes>
   );
 }

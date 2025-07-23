@@ -14,7 +14,7 @@ function createWindow() {
     mainWindow = new BrowserWindow(
         {
             width: 400,
-            height: 700,
+            height: 660,
             minWidth: 400,
             minHeight: 500,
             icon: path.join(__dirname, 'icon.png'),
@@ -60,7 +60,7 @@ function createWindow() {
             ]
         },
     ];
-    if(isDev) {
+    if (isDev) {
         menuTemplate.push({
             label: 'View',
             submenu: [
@@ -86,18 +86,26 @@ function createWindow() {
     if (isDev) {
         // During development, load the React dev server
         mainWindow.loadURL("http://localhost:5173/"); // or your dev server port
-       //  mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
+        //  mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
         // Open DevTools automatically in development
         mainWindow.webContents.openDevTools();
     } else {
         // and load the index.html of the app.
         mainWindow.loadFile(path.join(__dirname, "../renderer/dist/index.html"));
-     //   mainWindow.webContents.openDevTools();
+        //   mainWindow.webContents.openDevTools();
     }
 
 }
 
 app.whenReady().then(() => {
+    // Set autostart at launch based on stored preference
+    const autostart = store.get('autostart');
+    if (typeof autostart === 'boolean') {
+        app.setLoginItemSettings({
+            openAtLogin: autostart,
+            path: app.getPath('exe'),
+        });
+    }
     createWindow();
     registerIpcHandlers();
 });
@@ -132,5 +140,25 @@ function registerIpcHandlers() {
         }
         console.log(secret);
         return secret;
+    });
+    ipcMain.handle('set-autostart', (event, value) => {
+        console.log('Setting autostart:', value);
+        try {
+            app.setLoginItemSettings({
+                openAtLogin: value,
+                path: app.getPath('exe'),
+            });
+            const settings = app.getLoginItemSettings();
+            console.log('Getting autostart (OS):', settings.openAtLogin);
+            return !!settings.openAtLogin;
+        } catch (error) {
+            console.error('Error setting autostart:', error);
+            return false;
+        }
+    });
+    ipcMain.handle('get-autostart', () => {
+        const settings = app.getLoginItemSettings();
+        console.log('Getting autostart (OS):', settings.openAtLogin);
+        return !!settings.openAtLogin;
     });
 }
