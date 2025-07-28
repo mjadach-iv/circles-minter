@@ -12,11 +12,22 @@
   },
   "win": {
     "icon": "assets/icon.ico",
-    "target": "nsis"
+    "target": ["nsis", "portable"]
   },
   "nsis": {
     "oneClick": false,
     "perMachine": true,
     "allowToChangeInstallationDirectory": true
+  },
+  "mac": {
+    "icon": "assets/icon.icns",
+    "target": ["dmg", "zip"]
+  },
+  "dmg": {
+    "background": "assets/icon.png"
+  },
+  "linux": {
+    "icon": "assets/icon.png",
+    "target": ["AppImage", "deb", "rpm", "tar.gz"]
   }
 }
