@@ -26,7 +26,7 @@ export default function IndexPage() {
   return (
     <DefaultLayout>
       <div>
-        <p 
+        <p
           className='text-lg mb-2'
           style={{ width: '100%', maxWidth: '500px', margin: 'calc(var(--spacing) * 2) auto' }}
         >
@@ -79,7 +79,7 @@ export default function IndexPage() {
             <div
               className="flex flex-col items-center justify-center"
             >
-              <p className="text-default-500 text-center mt-20">No accounts found.</p>
+              <p className="text-default-500 text-center mt-20">No Circles accounts found.</p>
               <Link
                 to="/accounts?add=true"
                 className="text-default-500 text-center mt-2"

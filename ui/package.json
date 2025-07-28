@@ -1,14 +1,15 @@
 {
-  "name": "CRC Auto Minter",
+  "name": "CRC-Auto-Minter",
   "version": "0.0.1",
   "main": "main/index.js",
   "type": "module",
   "scripts": {
-    "electron": "NODE_ENV=development electron-forge start",
-    "electron:dev": "NODE_ENV=development electronmon .",
+    "electron": "cross-env NODE_ENV=development electron-forge start",
+    "electron:dev": "cross-env NODE_ENV=development electronmon .",
     "start": "concurrently \"npm run electron:dev\" \"npm run react\"",
     "react": "cd renderer && npm run dev",
-    "build": "cd renderer && npm run build && cd .. && npx electron-forge package"
+    "build": "cd renderer && npm run build && cd .. && npx electron-forge package",
+    "make": "cd renderer && npm run build && cd .. && npx electron-forge make"
   },
   "keywords": [],
   "author": "Michal Jadach",
@@ -20,6 +21,7 @@
     "@electron-forge/maker-squirrel": "^7.8.1",
     "@electron-forge/maker-zip": "^7.8.1",
     "concurrently": "^9.2.0",
+    "cross-env": "^10.0.0",
     "electron": "^37.2.2",
     "electron-forge": "^5.2.4",
     "electron-prebuilt-compile": "^8.2.0",

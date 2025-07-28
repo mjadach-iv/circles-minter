@@ -17,14 +17,16 @@ function createWindow() {
             height: 660,
             minWidth: 400,
             minHeight: 500,
-            icon: path.join(__dirname, 'icon.png'),
+            icon: path.join(app.getAppPath(), '../assets/icon.png'),
             webPreferences: {
-                preload: path.join(__dirname, 'preload.js'),
+                preload: path.join(app.getAppPath(), 'preload.js'),
                 contextIsolation: true,
                 nodeIntegration: false,
             }
         },
     );
+
+
 
     // Custom menu template
     const menuTemplate = [
@@ -72,8 +74,13 @@ function createWindow() {
         })
     }
 
-    const menu = Menu.buildFromTemplate(menuTemplate);
-    Menu.setApplicationMenu(menu);
+    if (process.platform === 'darwin') {
+        const menu = Menu.buildFromTemplate(menuTemplate);
+        Menu.setApplicationMenu(menu);
+    } else {
+        Menu.setApplicationMenu(null);
+    }
+
 
     // Disable zooming (Ctrl/Cmd +/-, Ctrl/Cmd + Mousewheel, pinch)
     mainWindow.webContents.on('before-input-event', (event, input) => {

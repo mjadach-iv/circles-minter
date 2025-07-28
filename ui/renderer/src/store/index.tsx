@@ -79,13 +79,13 @@ export const useStore = create<StoreState>()(
             const encryptedPrivateKey = await encryptString(privateKey, uiSecret);
             const ownerAddress = account.address as Address;
 
-            set((state) => ({ 
+            set((state) => ({
                 accounts: [
-                    ...state.accounts, 
-                    { 
-                        name, 
-                        encryptedPrivateKey: encryptedPrivateKey, 
-                        publicKey: ownerAddress 
+                    ...state.accounts,
+                    {
+                        name,
+                        encryptedPrivateKey: encryptedPrivateKey,
+                        publicKey: ownerAddress
                     }
                 ]
             }), false, 'addAccount');
@@ -121,9 +121,11 @@ export const useStore = create<StoreState>()(
                 const db = await window.electronAPI.getDb();
                 if (!db || !db.accounts) {
                     console.warn('No accounts found in the database');
+                    set(() => ({ loadingApp: false }), false, 'loadAppState');
                     return;
                 }
-                set(() => ({ 
+
+                set(() => ({
                     accounts: db.accounts
                 }), false, 'loadAccounts');
 
@@ -143,7 +145,7 @@ export const useStore = create<StoreState>()(
             }
         },
         getTotalBalance: async (profileAddress: Address) => {
-            set((state) => ({ 
+            set((state) => ({
                 balances: {
                     ...state.balances,
                     [profileAddress]: {
@@ -164,7 +166,7 @@ export const useStore = create<StoreState>()(
             // });
             // const json = await rez.json();
             // console.log(`Total balance for ${profileAddress}:`, json);
-            
+
             const avatar = get().avatars[profileAddress];
             const balance = await avatar.getTotalBalance();
             const mintableAmount = await avatar.getMintableAmount();
@@ -172,7 +174,7 @@ export const useStore = create<StoreState>()(
             console.log(`Total balance for ${profileAddress}:`, balance);
             console.log(`Mintable amount for ${profileAddress}:`, mintableAmount, mintable);
 
-            set((state) => ({ 
+            set((state) => ({
                 balances: {
                     ...state.balances,
                     [profileAddress]: {

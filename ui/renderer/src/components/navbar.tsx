@@ -90,7 +90,7 @@ export const Navbar = () => {
           <Link to={siteConfig.links.github} title="GitHub">
             <GithubIcon className="text-default-500" />
           </Link>
-          
+
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
@@ -114,13 +114,16 @@ export const Navbar = () => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu
+        className="NavbarMenu"
+        style={{ overflow: "hidden" }}
+      >
         {/* {searchInput} */}
         <div className="mx-4 mt-2 flex flex-col gap-2 items-center">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
-              <Link  
-              to={item.href} 
+              <Link
+              to={item.href}
               >
                 {item.label}
               </Link>
