@@ -1,0 +1,22 @@
+{
+  "appId": "com.mjadachiv.crcautominter",
+  "productName": "CRC Auto Minter",
+  "files": [
+    "main/**/*",
+    "renderer/dist/**/*",
+    "assets/**/*",
+    "package.json"
+  ],
+  "directories": {
+    "buildResources": "assets"
+  },
+  "win": {
+    "icon": "assets/icon.ico",
+    "target": "nsis"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true
+  }
+}
