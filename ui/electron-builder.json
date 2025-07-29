@@ -21,7 +21,8 @@
   },
   "mac": {
     "icon": "assets/icon.icns",
-    "target": ["dmg", "zip"]
+    "target": ["dmg", "zip"],
+    "identity": null
   },
   "dmg": {
     "background": "assets/icon.png"

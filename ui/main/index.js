@@ -1,16 +1,24 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, Menu, Tray, nativeImage } from 'electron';
 import Store from 'electron-store';
-import { decryptJson, encryptJson, generateSecret, decryptString } from './functions.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { menuTemplate } from './menuTemplate.js';
+import { registerIpcHandlers } from './ipc.js';
 
 const isDev = process.env.NODE_ENV === "development";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const store = new Store();
+let trayIcon = nativeImage.createFromPath(path.join(app.getAppPath(), 'assets/circles-logo-64.png'));
+if (process.platform === 'darwin') {
+    trayIcon = nativeImage.createFromPath(path.join(app.getAppPath(), 'assets/circles-logo-22.png'));
+    trayIcon.setTemplateImage(true);
+}
 let mainWindow = null;
+let displayWindow = true;
+
 
 function createWindow() {
-
     mainWindow = new BrowserWindow(
         {
             width: 400,
@@ -19,60 +27,12 @@ function createWindow() {
             minHeight: 500,
             icon: path.join(app.getAppPath(), '../assets/icon.png'),
             webPreferences: {
-                preload: path.join(app.getAppPath(), 'preload.js'),
+                preload: path.join(app.getAppPath(), 'main/preload.js'),
                 contextIsolation: true,
                 nodeIntegration: false,
             }
         },
     );
-
-
-
-    // Custom menu template
-    const menuTemplate = [
-        {
-            label: 'CRC Auto Minter', // Changed from 'File' to app name
-            submenu: [
-                { role: 'quit' }
-            ]
-        },
-        {
-            label: 'Edit',
-            submenu: [
-                { role: 'paste' },
-            ]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'Report an issue',
-                    click: async () => {
-                        const { shell } = require('electron');
-                        await shell.openExternal('https://github.com/mjadach-iv/crc-auto-minter/issues');
-                    }
-                },
-                {
-                    label: 'See the Github repo',
-                    click: async () => {
-                        const { shell } = require('electron');
-                        await shell.openExternal('https://github.com/mjadach-iv/crc-auto-minter');
-                    }
-                }
-            ]
-        },
-    ];
-    if (isDev) {
-        menuTemplate.push({
-            label: 'View',
-            submenu: [
-                { role: 'reload' },
-                { role: 'forcereload' },
-                { type: 'separator' },
-                { role: 'toggledevtools' }
-            ]
-        })
-    }
 
     if (process.platform === 'darwin') {
         const menu = Menu.buildFromTemplate(menuTemplate);
@@ -89,6 +49,7 @@ function createWindow() {
         }
     });
     mainWindow.webContents.setZoomFactor(1);
+
 
     if (isDev) {
         // During development, load the React dev server
@@ -115,57 +76,70 @@ app.whenReady().then(() => {
     }
     createWindow();
     registerIpcHandlers();
+
+    // Add tray icon with simple menu
+
+    // function handleShow() {
+    //     displayWindow = true;
+    //     if (mainWindow) mainWindow.show();
+    //     if (process.platform === 'darwin') app.dock.show();
+    //     updateTrayMenu();
+    // }
+    // function handleHide() {
+    //     displayWindow = false;
+    //     if (mainWindow) mainWindow.hide();
+    //     if (process.platform === 'darwin') app.dock.hide();
+    //     updateTrayMenu();
+    // }
+
+    let tray = new Tray(trayIcon);
+    function updateTrayMenu() {
+        console.log('Updating tray menu, displayWindow:', displayWindow);
+        const trayMenu = Menu.buildFromTemplate([
+            !displayWindow ? {
+                label: 'Show',
+                click: () => {
+                    if (!mainWindow) return;
+                    displayWindow = true;
+                    app.displayWindow = true;
+                    mainWindow.show();
+                    if (process.platform === 'darwin') app.dock.show();
+                    updateTrayMenu();
+                }
+            } : {
+                label: 'Hide',
+                click: () => {
+                    if (!mainWindow) return;
+                    displayWindow = false;
+                    app.displayWindow = false;
+                    mainWindow.hide();
+                    if (process.platform === 'darwin') app.dock.hide();
+                    updateTrayMenu();
+                }
+            },
+            {
+                label: 'Quit',
+                click: () => {
+                    app.isQuiting = true;
+                    app.quit();
+                }
+            }
+        ]);
+        tray.setContextMenu(trayMenu);
+    }
+    updateTrayMenu();
+    tray.setToolTip('CRC Auto Minter');
+    tray.on('double-click', handleShow);
+
+
+    // Prevent default close button behavior: hide window instead of quitting
+    mainWindow.on('close', (event) => {
+        if (!app.isQuiting) {
+            event.preventDefault();
+            displayWindow = false;
+            mainWindow.hide();
+            if (process.platform === 'darwin') app.dock.hide();
+            updateTrayMenu();
+        }
+    });
 });
-
-const store = new Store();
-function registerIpcHandlers() {
-    ipcMain.handle('get-db', async (event) => {
-        try {
-            const db = store.get('db');
-            const json = db ? decryptJson(db) : null;
-            return json;
-        } catch (error) {
-            console.error('Error getting DB:', error);
-            return null;
-        }
-    });
-
-    ipcMain.handle('save-db', (event, value) => {
-        console.log('Saving DB:', value);
-        const db = encryptJson(value);
-        store.set('db', db);
-        return true;
-    });
-
-    ipcMain.handle('get-ui-secret', (event) => {
-        const secret = store.get('uiSecret');
-        if (!secret) {
-            const randomString = generateSecret(); // 32 hex chars
-            console.log(randomString);
-            store.set('uiSecret', randomString);
-            return randomString; // Return the newly generated secret
-        }
-        console.log(secret);
-        return secret;
-    });
-    ipcMain.handle('set-autostart', (event, value) => {
-        console.log('Setting autostart:', value);
-        try {
-            app.setLoginItemSettings({
-                openAtLogin: value,
-                path: app.getPath('exe'),
-            });
-            const settings = app.getLoginItemSettings();
-            console.log('Getting autostart (OS):', settings.openAtLogin);
-            return !!settings.openAtLogin;
-        } catch (error) {
-            console.error('Error setting autostart:', error);
-            return false;
-        }
-    });
-    ipcMain.handle('get-autostart', () => {
-        const settings = app.getLoginItemSettings();
-        console.log('Getting autostart (OS):', settings.openAtLogin);
-        return !!settings.openAtLogin;
-    });
-}
