@@ -55,6 +55,7 @@ interface StoreState {
     };
     addAccount: (name: string, privateKey: Address) => void;
     removeAccount: (index: number) => void;
+    refreshProfiles: (ownerAddress: Address) => Promise<void>;
     fetchMetriSafes: (owner: Address) => Promise<void>;
     profiles: {
         [ownerAddress: Address]: Profile[];
@@ -115,6 +116,15 @@ export const useStore = create<StoreState>()(
                 delete newProfiles[ownerAddress];
                 return { profiles: newProfiles };
             }, false, 'removeProfiles');
+        },
+        refreshProfiles: async (ownerAddress: Address) => {
+            const profiles = await getProfiles(ownerAddress);
+            set((state) => ({
+                profiles: {
+                    ...state.profiles,
+                    [ownerAddress]: profiles
+                }
+            }), false, 'addProfiles');
         },
         loadDB: async () => {
             try{

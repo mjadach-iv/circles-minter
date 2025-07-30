@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     Card,
     CardHeader,
@@ -10,6 +11,7 @@ import {
 } from "@heroui/react";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdAccountBalanceWallet } from "react-icons/md";
+import { IoMdRefreshCircle } from "react-icons/io";
 import { useStore } from "../store";
 import type { Address } from "../types";
 
@@ -21,8 +23,21 @@ type Props = {
 
 export default function CardComponent(props: Props) {
     const removeAccount = useStore((state) => state.removeAccount);
+    const refreshProfiles = useStore((state) => state.refreshProfiles);
+    const [isFetching, setIsFetching] = useState(false);
     const allProfiles = useStore((state) => state.profiles);
     const profilesOfTheOwner = allProfiles[props.publicKey];
+
+
+    async function handleRefreshProfiles() {
+        const start = Date.now();
+        setIsFetching(true);
+        await refreshProfiles(props.publicKey);
+        if (Date.now() - start < 1000) {
+            await new Promise(resolve => setTimeout(resolve, 1000 - (Date.now() - start)));
+        }
+        setIsFetching(false);
+    }
 
     return (
         <Card className="max-w-[400px]">
@@ -64,7 +79,13 @@ export default function CardComponent(props: Props) {
                 <div>
                     {
                         (!profilesOfTheOwner || profilesOfTheOwner?.length === 0) &&
-                        <p className="text-sm text-default-500">No Circles account found.</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-default-500">No Circles account found.</p>
+                            <IoMdRefreshCircle 
+                                className = {`text-default-700 ${isFetching ? 'animate-spin ' : ''}`}
+                                onClick={handleRefreshProfiles}
+                            />
+                        </ div>
                     }
                     {
                         (profilesOfTheOwner && profilesOfTheOwner?.length !== 0) &&
