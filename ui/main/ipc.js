@@ -2,6 +2,7 @@ import { app, ipcMain, dialog } from 'electron';
 import Store from 'electron-store';
 import { decryptJson, encryptJson, generateSecret } from './functions.js';
 import { addToLaunchAgents, removeFromLaunchAgents, isInLaunchAgents } from './addToLaunchAgents.js';
+import { mintNow } from './circles/index.js';
 
 const store = new Store();
 export function registerIpcHandlers() {
@@ -34,6 +35,7 @@ export function registerIpcHandlers() {
         console.log(secret);
         return secret;
     });
+
     ipcMain.handle('set-autostart', (event, value) => {
         console.log('Setting autostart:', value);
 
@@ -72,6 +74,7 @@ export function registerIpcHandlers() {
         //     return false;
         // }
     });
+
     ipcMain.handle('get-autostart', () => {
         if (process.platform === 'darwin') {
             const check = isInLaunchAgents();
@@ -81,6 +84,23 @@ export function registerIpcHandlers() {
         const settings = app.getLoginItemSettings();
         console.log('Getting autostart (OS):', settings.openAtLogin);
         return !!settings.openAtLogin;
+    });
+
+    ipcMain.handle('auto-minting', (event, value) => {
+        const next = Date.now() + 24 * 60 * 60 * 1000; // Set to 24 hours in the future
+        console.log('Setting auto-minting:', value);
+        store.set('auto-minting', { value, next });
+        return { value, next };
+    });
+
+    ipcMain.handle('get-auto-minting', (event) => {        
+        return store.get('auto-minting');
+    });
+
+    ipcMain.handle('mint-now', async (event) => {
+        console.log('Minting now:');
+        await mintNow();
+        return true;
     });
 
 }

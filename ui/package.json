@@ -25,7 +25,11 @@
     "electronmon": "^2.0.3"
   },
   "dependencies": {
+    "@circles-sdk/sdk": "^0.29.0",
+    "@cometh/connect-sdk-4337": "^1.0.13",
     "dotenv": "^17.2.0",
-    "electron-store": "^10.1.0"
+    "electron-store": "^10.1.0",
+    "ethers": "^6.15.0",
+    "viem": "^2.33.1"
   }
 }

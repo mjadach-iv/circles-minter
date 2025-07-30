@@ -7,5 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getUiSecret: () => ipcRenderer.invoke('get-ui-secret'),
   setAutostart: (value) => ipcRenderer.invoke('set-autostart', value),
   getAutostart: () => ipcRenderer.invoke('get-autostart'),
-  // add more methods as needed
+  mintNow: () => ipcRenderer.invoke('mint-now'),
+  setAutoMinting: (value) => ipcRenderer.invoke('set-auto-minting', value),
+  getAutoMinting: () => ipcRenderer.invoke('get-auto-minting'),
 });

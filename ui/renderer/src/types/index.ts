@@ -9,6 +9,9 @@ declare global {
             getUiSecret: () => Promise<string>;
             setAutostart: (value: boolean) => Promise<boolean>;
             getAutostart: () => Promise<boolean>;
+            mintNow: () => Promise<void>;
+            setAutoMinting: (value: boolean) => Promise<boolean>;
+            getAutoMinting: () => Promise<boolean>;
         };
     }
 }

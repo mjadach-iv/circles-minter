@@ -94,6 +94,12 @@ export default function IndexPage() {
             </div>
         }
       </div>
+              <Button
+                size="md"
+                onClick={() => window.electronAPI.mintNow()}
+              >
+                Mint Now
+              </Button>
     </DefaultLayout>
   );
 }

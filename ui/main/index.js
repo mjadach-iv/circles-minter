@@ -7,7 +7,6 @@ import path from 'path';
 import { menuTemplate } from './menuTemplate.js';
 import { registerIpcHandlers } from './ipc.js';
 
-
 const isDev = process.env.NODE_ENV === "development";
 const LAUNCHED_BY_LAUNCHAGENT = process.env.LAUNCHED_BY_LAUNCHAGENT === "1";
 const AUTOLUNCHED = LAUNCHED_BY_LAUNCHAGENT || app.getLoginItemSettings().wasOpenedAtLogin;
