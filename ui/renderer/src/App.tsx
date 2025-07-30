@@ -15,6 +15,16 @@ function App() {
     loadDB();
   }, [])
 
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.tagName === "A") {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("dragstart", handler, true);
+    return () => document.removeEventListener("dragstart", handler, true);
+  }, []);
+
   return (
     <Routes>
       <Route element={<IndexPage />} path="/" />

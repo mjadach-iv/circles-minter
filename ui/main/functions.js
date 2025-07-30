@@ -21,6 +21,7 @@ export function decryptJson(encrypted, password) {
     const secretTMP = secret + (passwordProtect ? password : '');
     const [version, ivHex, encryptedData] = encrypted.split(':');
     const iv = Buffer.from(ivHex, 'hex');
+    console.log('Decrypting with secret:', secretTMP);
     const decipher = crypto.createDecipheriv(algorithm, crypto.scryptSync(secretTMP, 'salt', 32), iv);
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
@@ -89,3 +90,4 @@ export async function decryptString(encrypted, secret) {
   );
   return new TextDecoder().decode(decrypted);
 }
+

@@ -9,7 +9,8 @@
     "start": "concurrently \"npm run electron:dev\" \"npm run react\"",
     "react": "cd renderer && npm run dev",
     "package": "cd renderer && npm run build && cd .. && npx electron-builder --config electron-builder.json --dir",
-    "installer:win": "cd renderer && npm run build && cd .. && npx electron-builder --config electron-builder.json --win --x64"
+    "installer:win": "cd renderer && npm run build && cd .. && npx electron-builder --config electron-builder.json --win --x64",
+    "installer:mac": "cd renderer && npm run build && cd .. && npx electron-builder --config electron-builder.json --mac --x64 --arm64"
   },
   "keywords": [],
   "author": "Michal Jadach",

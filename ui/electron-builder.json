@@ -5,7 +5,8 @@
     "main/**/*",
     "renderer/dist/**/*",
     "assets/**/*",
-    "package.json"
+    "package.json",
+    ".env"
   ],
   "directories": {
     "buildResources": "assets"
@@ -21,11 +22,15 @@
   },
   "mac": {
     "icon": "assets/icon.icns",
-    "target": ["dmg", "zip"],
+    "target": ["dmg"],
     "identity": null
   },
   "dmg": {
-    "background": "assets/icon.png"
+    "background": "assets/icon.png",
+    "window": {
+      "width": 550,
+      "height": 400
+    }
   },
   "linux": {
     "icon": "assets/icon.png",

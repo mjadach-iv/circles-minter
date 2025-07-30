@@ -1,6 +1,7 @@
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, dialog } from 'electron';
 import Store from 'electron-store';
 import { decryptJson, encryptJson, generateSecret } from './functions.js';
+import { addToLaunchAgents, removeFromLaunchAgents, isInLaunchAgents } from './addToLaunchAgents.js';
 
 const store = new Store();
 export function registerIpcHandlers() {
@@ -35,23 +36,51 @@ export function registerIpcHandlers() {
     });
     ipcMain.handle('set-autostart', (event, value) => {
         console.log('Setting autostart:', value);
-        try {
-            app.setLoginItemSettings({
-                openAtLogin: value,
-                path: app.getPath('exe'),
-            });
-            const settings = app.getLoginItemSettings();
-            console.log('Getting autostart (OS):', settings.openAtLogin);
-            store.set('autostart', settings.openAtLogin);
-            return !!settings.openAtLogin;
-        } catch (error) {
-            console.error('Error setting autostart:', error);
-            return false;
+
+        if (process.platform === 'darwin') {
+            if (value) {
+                addToLaunchAgents(); // Ensure LaunchAgent is set up
+            } else {
+                removeFromLaunchAgents(); // Remove existing LaunchAgent if any
+            }
+            const check = isInLaunchAgents();
+            return check;
         }
+
+        // removeFromLaunchAgents(); // Remove existing LaunchAgent if any
+
+
+        //         const check2 = isInLaunchAgents();
+        // if (check2) {
+        //     console.log('LaunchAgent is already set up');
+        // } else {
+        //     console.log('LaunchAgent is NOT already set up');
+        // }
+        // try {
+        //     let loginItemSettings = { 
+        //         openAtLogin: value 
+        //     };
+        //     if (process.platform !== 'darwin') {
+        //         loginItemSettings.path = app.getPath('exe');
+        //     }
+        //     app.setLoginItemSettings(loginItemSettings);
+        //     const settings = app.getLoginItemSettings();
+        //     console.log('Getting autostart (OS):', settings.openAtLogin);
+        //     store.set('autostart', settings.openAtLogin);
+        //     return !!settings.openAtLogin;
+        // } catch (error) {
+        //     return false;
+        // }
     });
     ipcMain.handle('get-autostart', () => {
+        if (process.platform === 'darwin') {
+            const check = isInLaunchAgents();
+            return check;
+        }
+
         const settings = app.getLoginItemSettings();
         console.log('Getting autostart (OS):', settings.openAtLogin);
         return !!settings.openAtLogin;
     });
+
 }
