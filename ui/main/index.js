@@ -7,6 +7,7 @@ import path from 'path';
 import { menuTemplate } from './menuTemplate.js';
 import { registerIpcHandlers } from './ipc.js';
 import { powerMonitor } from 'electron';
+import { mintNow } from './circles/index.js';
 
 const isDev = process.env.NODE_ENV === "development";
 const LAUNCHED_BY_LAUNCHAGENT = process.env.LAUNCHED_BY_LAUNCHAGENT === "1";
@@ -142,6 +143,19 @@ app.whenReady().then(() => {
     function updateTrayMenu() {
         console.log('Updating tray menu, displayWindow:', displayWindow);
         const trayMenu = Menu.buildFromTemplate([
+            {
+                label: 'CRC Auto Minter',
+                enabled: false, 
+            },
+            {
+                label: 'Mint now',
+                click: async () => {
+                    console.log('Minting now:');
+                    const rez = await mintNow();
+                    return rez;
+                }
+            },
+            { type: 'separator' },
             !displayWindow ? {
                 label: 'Show',
                 click: () => {
