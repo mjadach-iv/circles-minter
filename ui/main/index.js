@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { menuTemplate } from './menuTemplate.js';
 import { registerIpcHandlers } from './ipc.js';
+import { powerMonitor } from 'electron';
 
 const isDev = process.env.NODE_ENV === "development";
 const LAUNCHED_BY_LAUNCHAGENT = process.env.LAUNCHED_BY_LAUNCHAGENT === "1";
@@ -90,6 +91,7 @@ Object.keys(osSignals).forEach(sig => {
     try {
         process.on(sig, () => {
             console.log(`Received signal: ${sig}`);
+
         });
     } catch (e) {
         // Some signals can't be caught, ignore errors
@@ -118,6 +120,11 @@ app.whenReady().then(() => {
     createWindow();
 
     registerIpcHandlers();
+
+    powerMonitor.on('resume', () => {
+        console.log('System woke up from sleep!');
+        app.wokeUpFromSleep = true;
+    });
 
     // Prevent default close button behavior: hide window instead of quitting
     mainWindow.on('close', (event) => {

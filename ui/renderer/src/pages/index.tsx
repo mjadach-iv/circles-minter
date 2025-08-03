@@ -9,7 +9,7 @@ import { type Address } from "../types";
 
 export default function IndexPage() {
   const automaticMinting = useStore((state) => state.automaticMinting);
-  const { profiles, loadingApp, minting } = useStore();
+  const { profiles, loadingApp, isMinting } = useStore();
   const profilesOwners = Object.keys(profiles);
 
   const areThereProfiles = () => {
@@ -31,7 +31,7 @@ export default function IndexPage() {
           style={{ width: '100%', maxWidth: '500px', margin: 'calc(var(--spacing) * 2) auto' }}
         >
           {
-            minting ?
+            isMinting ?
               'Minting...'
               :
               automaticMinting
@@ -43,7 +43,7 @@ export default function IndexPage() {
         </p>
 
         <Clock
-          minting={minting}
+          aroundAnimation={isMinting}
         />
         {
           loadingApp ? (
@@ -94,12 +94,12 @@ export default function IndexPage() {
             </div>
         }
       </div>
-              <Button
-                size="md"
-                onClick={() => window.electronAPI.mintNow()}
-              >
-                Mint Now
-              </Button>
+      <Button
+        size="md"
+        onClick={() => useStore.getState().mintNow()}
+      >
+        Mint Now
+      </Button>
     </DefaultLayout>
   );
 }

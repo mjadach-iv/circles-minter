@@ -17,13 +17,34 @@ export default function AccountCard({ address, name, description, image }: Props
   const totalBalance = balances[address]?.balance;
   const mintable = balances[address]?.mintable || 0;
 
-  useEffect(() => {
+useEffect(() => {
+  getTotalBalance(address);
+
+  // Calculate ms until the next full hour
+  const now = new Date();
+  const msToNextHour =
+    (60 - now.getMinutes()) * 60 * 1000 -
+    now.getSeconds() * 1000 -
+    now.getMilliseconds();
+
+  // Set a timeout to run at the next full hour
+  const timeout = setTimeout(() => {
     getTotalBalance(address);
+
+    // Then set an interval to run every hour on the hour
     const interval = setInterval(() => {
       getTotalBalance(address);
-    }, 60 * 60 * 1000); // every hour
-    return () => clearInterval(interval);
-  }, [address, getTotalBalance]);
+    }, 60 * 60 * 1000);
+
+    // Store interval id on the timeout so we can clear it later
+    (timeout as any).interval = interval;
+  }, msToNextHour);
+
+  return () => {
+    clearTimeout(timeout);
+    if ((timeout as any).interval) clearInterval((timeout as any).interval);
+  };
+}, [address, getTotalBalance]);
 
   return (
     <Card

@@ -2,21 +2,37 @@ import { useEffect, useState } from "react";
 
 // SVG digit segments for a 7-segment display
 const SEGMENTS = [
-    // a, b, c, d, e, f, g
-    [1, 1, 1, 1, 1, 1, 0], // 0
-    [0, 1, 1, 0, 0, 0, 0], // 1
-    [1, 1, 0, 1, 1, 0, 1], // 2
-    [1, 1, 1, 1, 0, 0, 1], // 3
-    [0, 1, 1, 0, 0, 1, 1], // 4
-    [1, 0, 1, 1, 0, 1, 1], // 5
-    [1, 0, 1, 1, 1, 1, 1], // 6
-    [1, 1, 1, 0, 0, 0, 0], // 7
-    [1, 1, 1, 1, 1, 1, 1], // 8
+//  [A, B, C, D, E, F, G]
+    [1, 1, 1, 1, 1, 1, 0], // 0                 ----A----
+    [0, 1, 1, 0, 0, 0, 0], // 1                |         | 
+    [1, 1, 0, 1, 1, 0, 1], // 2                F         B 
+    [1, 1, 1, 1, 0, 0, 1], // 3                |         | 
+    [0, 1, 1, 0, 0, 1, 1], // 4                 ----G----
+    [1, 0, 1, 1, 0, 1, 1], // 5                |         | 
+    [1, 0, 1, 1, 1, 1, 1], // 6                E         C 
+    [1, 1, 1, 0, 0, 0, 0], // 7                |         |
+    [1, 1, 1, 1, 1, 1, 1], // 8                 ----D----
     [1, 1, 1, 1, 0, 1, 1], // 9
     [0, 0, 0, 0, 0, 0, 0], // nothing
+    [1, 0, 0, 0, 0, 0, 0], // top
+    [1, 1, 0, 0, 0, 0, 0], // top, right top
+    [1, 1, 1, 0, 0, 0, 0], // top, right
+    [1, 1, 1, 1, 0, 0, 0], // top, right, bottom
+    [0, 0, 0, 1, 0, 0, 0], // bottom
+    [1, 0, 0, 1, 0, 0, 0], // bottom, top
+    [1, 0, 0, 1, 1, 0, 0], // bottom, left bottom, top
+    [1, 0, 0, 1, 1, 1, 0], // bottom, left, top
+    [0, 0, 0, 1, 1, 1, 0], // bottom, left
+    [0, 1, 1, 1, 0, 0, 0], // bottom, right
+    [0, 0, 1, 1, 0, 0, 0], // bottom, right bottom
+    [0, 0, 0, 0, 1, 1, 0], // left
+    [0, 0, 0, 0, 0, 1, 0], // left top
 ];
 
-function Digit({ n }: { n: number }) {
+function Digit({ n }: { n?: number }) {
+    if (n === undefined || n < 0 || n >= SEGMENTS.length) {
+        n = 10; // default to nothing
+    }
     const on = (i: number) => SEGMENTS[n][i] ? 'orange' : '#222';
     return (
         <svg
@@ -48,22 +64,59 @@ function Digit({ n }: { n: number }) {
     );
 }
 
-function Colon() {
+function Colon({ on = true }: { on?: boolean }) {
     return (
         <svg width={16} height={56} viewBox="0 0 16 56">
-            <circle cx="8" cy="18" r="4" fill="orange" />
-            <circle cx="8" cy="38" r="4" fill="orange" />
+            <circle cx="8" cy="18" r="4" fill={on ? "orange" : "#222"} />
+            <circle cx="8" cy="38" r="4" fill={on ? "orange" : "#222"} />
         </svg>
     );
 }
 
 type ClockProps = {
     countdownTo?: Date;
-    minting?: boolean;
+    noTime?: boolean;
+    aroundAnimation?: boolean;
 };
+
+const AROUND_ANIMATION = [
+    [10, 10, 10, 10, 10, 10],
+    [11, 10, 10, 10, 10, 10],
+    [11, 11, 10, 10, 10, 10],
+    [11, 11, 11, 10, 10, 10],
+    [11, 11, 11, 11, 10, 10],
+    [11, 11, 11, 11, 11, 10],
+    [11, 11, 11, 11, 11, 11],
+    [11, 11, 11, 11, 11, 12],
+    [11, 11, 11, 11, 11, 13],
+    [11, 11, 11, 11, 11, 14],
+    [11, 11, 11, 11, 16, 14],
+    [11, 11, 11, 16, 16, 14],
+    [11, 11, 16, 16, 16, 14],
+    [11, 16, 16, 16, 16, 14],
+    [16, 16, 16, 16, 16, 14],
+    [17, 16, 16, 16, 16, 14],
+    [18, 16, 16, 16, 16, 14],
+    [19, 16, 16, 16, 16, 14],
+    [19, 15, 16, 16, 16, 14],
+    [19, 15, 15, 16, 16, 14],
+    [19, 15, 15, 15, 16, 14],
+    [19, 15, 15, 15, 15, 14],
+    [19, 15, 15, 15, 15, 20],
+    [19, 15, 15, 15, 15, 21],
+    [19, 15, 15, 15, 15, 15],
+    [19, 15, 15, 15, 15, 10],
+    [19, 15, 15, 15, 10, 10],
+    [19, 15, 15, 10, 10, 10],
+    [19, 15, 10, 10, 10, 10],
+    [19, 10, 10, 10, 10, 10],
+    [22, 10, 10, 10, 10, 10],
+    [23, 10, 10, 10, 10, 10],
+]
 
 export default function Clock(props: ClockProps) {
     const [on, setOn] = useState(false);
+    const [roundAnimationState, setRoundAnimationState] = useState([] as number[]);
 
     // Clock code
     // useEffect(() => {
@@ -102,16 +155,33 @@ export default function Clock(props: ClockProps) {
 
     useEffect(() => {
         let m: NodeJS.Timeout | undefined;
-        if (props.minting) {
+        if (props.noTime) {
             m = setInterval(() => { setOn((state) => !state) }, 1000);
         }
         return () => clearInterval(m);
-    }, [props.minting]);
+    }, [props.noTime]);
+
+    useEffect(() => {
+        let m: NodeJS.Timeout | undefined;
+        let state = 0;
+        if (props.aroundAnimation) {
+            m = setInterval(() => { 
+                setRoundAnimationState(AROUND_ANIMATION[state]);
+                state++;
+                if (state >= AROUND_ANIMATION.length) {
+                    state = 0;
+                }
+            }, 100);
+        } else {
+            () => clearInterval(m);
+        }
+        return () => clearInterval(m);
+    }, [props.aroundAnimation]);
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', background: '#111', padding: 8, borderRadius: 8, width: '330px', margin: 'auto' }}>
             {
-                props.minting ?
+                props.noTime ?
                 <>
                     <Digit n={on ? 8 : 10} />
                     <Digit n={on ? 8 : 10} />
@@ -121,6 +191,18 @@ export default function Clock(props: ClockProps) {
                     <Colon />
                     <Digit n={on ? 8 : 10} />
                     <Digit n={on ? 8 : 10} />
+                </>
+                :
+                props.aroundAnimation ?
+                <>
+                    <Digit n={roundAnimationState[0]} />
+                    <Digit n={roundAnimationState[1]} />
+                    <Colon on={false} />
+                    <Digit n={roundAnimationState[2]} />
+                    <Digit n={roundAnimationState[3]} />
+                    <Colon on={false} />
+                    <Digit n={roundAnimationState[4]} />
+                    <Digit n={roundAnimationState[5]} />
                 </>
                 :
                 <>

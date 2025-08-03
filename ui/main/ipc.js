@@ -3,6 +3,7 @@ import Store from 'electron-store';
 import { decryptJson, encryptJson, generateSecret } from './functions.js';
 import { addToLaunchAgents, removeFromLaunchAgents, isInLaunchAgents } from './addToLaunchAgents.js';
 import { mintNow } from './circles/index.js';
+import { powerMonitor } from 'electron';
 
 const store = new Store();
 export function registerIpcHandlers() {
@@ -99,8 +100,8 @@ export function registerIpcHandlers() {
 
     ipcMain.handle('mint-now', async (event) => {
         console.log('Minting now:');
-        await mintNow();
-        return true;
+        const rez = await mintNow();
+        return rez;
     });
 
 }

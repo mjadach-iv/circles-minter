@@ -7,7 +7,6 @@ import { decryptJson, decryptString } from '../functions.js';
 
 const store = new Store();
 
-
 main();
 async function main() {
     while (true) {
@@ -33,7 +32,13 @@ async function main() {
 }
 
 export async function mintNow() {
-    console.log('Calling function mintNow()');
+    console.log('Calling function mintNow()',
+        process.env.RPC_URL_GATEWAY,
+        process.env.RPC_URL_ANKR,
+        process.env.PUBLIC_CONNECT_4337_COMETH_API_KEY,
+        process.env.PUBLIC_COMETH_API_KEY,
+        process.env.ENCRYPT_SECRET
+    );
     try {
         const db = store.get('db');
         const secret = store.get('uiSecret');
@@ -46,10 +51,13 @@ export async function mintNow() {
             }
         }
         for (const privateKey of privateKeys) {
+            console.log('Minting with private key :', privateKey);
             await mint(privateKey);
         }
+        return true;
     } catch (error) {
         console.error('An error occurred during the minting process:', error);
+        return false;
     }
 }
 
@@ -107,7 +115,7 @@ async function mint(PRIVATE_KEY) {
             const normalFee = 0.0833288 * 3 * mintable;
             const fee = Number((normalFee/2).toFixed(10));
             console.log(`If you minted with metri the fee would be ${normalFee} CRC, but you will save ${fee} CRC on this minting!`);
-            const rez = await metrixMint(avatar.address, fee);
+            const rez = await metrixMint(avatar.address, fee, PRIVATE_KEY);
             console.log(`Minting successful for '${profile.name}': https://gnosisscan.io/tx/${rez}`);
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before next mint
         } else {

@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import { config as chainConfig } from '../config/constants';
 import { privateKeyToAccount } from 'viem/accounts';
 import { type Address } from '../types/index';
-import {encryptString} from '../crypto'
+import { encryptString } from '../crypto'
 
 
 const safeService = new SafeApiKit({
@@ -48,7 +48,7 @@ interface StoreState {
     avatars: {
         [profileAddress: Address]: Avatar;
     }
-    minting: boolean;
+    isMinting: boolean;
     automaticMinting: boolean;
     mintableAmounts: {
         [profileAddress: Address]: string | null;
@@ -61,7 +61,8 @@ interface StoreState {
         [ownerAddress: Address]: Profile[];
     };
     getTotalBalance: (ownerAddress: Address) => Promise<void>;
-    loadDB: ()=>{},
+    mintNow: () => Promise<void>;
+    loadDB: () => {},
 }
 
 
@@ -71,7 +72,7 @@ export const useStore = create<StoreState>()(
         accounts: [],
         profiles: {},
         balances: {},
-        minting: false,
+        isMinting: false,
         automaticMinting: false,
         mintableAmounts: {},
         addAccount: async (name: string, privateKey: Address) => {
@@ -126,33 +127,11 @@ export const useStore = create<StoreState>()(
                 }
             }), false, 'addProfiles');
         },
-        loadDB: async () => {
-            try{
-                const db = await window.electronAPI.getDb();
-                if (!db || !db.accounts) {
-                    console.warn('No accounts found in the database');
-                    set(() => ({ loadingApp: false }), false, 'loadAppState');
-                    return;
-                }
-
-                set(() => ({
-                    accounts: db.accounts
-                }), false, 'loadAccounts');
-
-                for (const account of db.accounts) {
-                    const profiles = await getProfiles(account.publicKey);
-                    set((state) => ({
-                        profiles: {
-                            ...state.profiles,
-                            [account.publicKey]: profiles
-                        }
-                    }), false, 'loadProfiles');
-                }
-
-                set(() => ({ loadingApp: false }), false, 'loadAppState');
-            } catch (error) {
-                console.error('Error loading database:', error);
-            }
+        mintNow: async () => {
+            set(() => ({ isMinting: true }), false, 'mintNow');
+            const result = await window.electronAPI.mintNow();
+            set(() => ({ isMinting: false }), false, 'mintNow');
+            return result;
         },
         getTotalBalance: async (profileAddress: Address) => {
             set((state) => ({
@@ -192,8 +171,38 @@ export const useStore = create<StoreState>()(
                         mintable,
                         isFetching: false
                     }
-            }}), false, 'setTotalBalance');
+                }
+            }), false, 'setTotalBalance');
         },
+        loadDB: async () => {
+            try {
+                const db = await window.electronAPI.getDb();
+                if (!db || !db.accounts) {
+                    console.warn('No accounts found in the database');
+                    set(() => ({ loadingApp: false }), false, 'loadAppState');
+                    return;
+                }
+
+                set(() => ({
+                    accounts: db.accounts
+                }), false, 'loadAccounts');
+
+                for (const account of db.accounts) {
+                    const profiles = await getProfiles(account.publicKey);
+                    set((state) => ({
+                        profiles: {
+                            ...state.profiles,
+                            [account.publicKey]: profiles
+                        }
+                    }), false, 'loadProfiles');
+                }
+
+                set(() => ({ loadingApp: false }), false, 'loadAppState');
+            } catch (error) {
+                console.error('Error loading database:', error);
+            }
+        },
+
     }))
 );
 
