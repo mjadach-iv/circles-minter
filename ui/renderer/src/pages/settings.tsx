@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { title } from "../components/primitives";
 import DefaultLayout from "../layouts/default";
-
 import {Switch} from "@heroui/react";
+import { version } from "../../package.json";
 
 
 export default function IndexPage() {
@@ -50,6 +50,11 @@ export default function IndexPage() {
             Autostart with your system
           </Switch>
         </div>
+        <p 
+          className="text-default-300 text-center mt-2 font-small fixed bottom-4"
+        >
+          Version: {version}
+        </p>
       </section>
     </DefaultLayout>
   );

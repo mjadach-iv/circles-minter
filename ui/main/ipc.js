@@ -87,8 +87,8 @@ export function registerIpcHandlers() {
     });
 
     ipcMain.handle('set-auto-minting', (event, autoMinting) => {
-        //const next = Date.now() + 24 * 60 * 60 * 1000;
-        const next = Date.now() + 20 * 1000;
+        const next = Date.now() + 24 * 60 * 60 * 1000;
+        //const next = Date.now() + 20 * 1000;
         console.log('Setting auto-minting:', autoMinting);
         store.set('auto-minting', { autoMinting, next });
         return { autoMinting, next };

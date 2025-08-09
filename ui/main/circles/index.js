@@ -29,11 +29,8 @@ export function stopMintLoop() {
 async function main(signal) {
     while (!signal?.aborted) {
         const autoMinting = store.get('auto-minting');
-        console.log('Checking auto-minting status...', autoMinting);
         if (!autoMinting || !autoMinting.autoMinting || !autoMinting.next) {
-        //    await new Promise(resolve => setTimeout(resolve, 60 * 1000)); // Wait for 1 minute before checking again
-            console.log('No auto-minting');
-            await sleep(5_000, signal);
+            await sleep(60_000, signal);
             continue;
         }
 

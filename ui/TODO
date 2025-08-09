@@ -1,0 +1,9 @@
+- autoupdate
+- auto trust from the CRC group
+- analytics
+- mac installer
+- test windows
+- test mac
+- test linux
+- workflow for building 
+- website
