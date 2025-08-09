@@ -4,19 +4,41 @@ import { mint as metrixMint, config as chainConfig } from '../../../src/metrix.j
 import { privateKeyCheck } from './missingPrivateKey.js';
 import Store from 'electron-store';
 import { decryptJson, decryptString } from '../functions.js';
+import { mainWindow } from '../index.js';
 
 const store = new Store();
 
-main();
-async function main() {
-    while (true) {
+let controller = null;
+
+export function startMintLoop() {
+  if (controller?.signal && !controller.signal.aborted) {
+    console.log('Mint loop already running.');
+    return;
+  }
+  controller = new AbortController();
+  void main(controller.signal);
+}
+
+export function stopMintLoop() {
+  if (controller?.signal && !controller.signal.aborted) {
+    controller.abort();
+    console.log('Mint loop stopped.');
+  }
+}
+
+async function main(signal) {
+    while (!signal?.aborted) {
         const autoMinting = store.get('auto-minting');
-        if (!autoMinting || !autoMinting.value) {
-            await new Promise(resolve => setTimeout(resolve, 60 * 1000)); // Wait for 1 minute before checking again
+        console.log('Checking auto-minting status...', autoMinting);
+        if (!autoMinting || !autoMinting.autoMinting || !autoMinting.next) {
+        //    await new Promise(resolve => setTimeout(resolve, 60 * 1000)); // Wait for 1 minute before checking again
+            console.log('No auto-minting');
+            await sleep(5_000, signal);
             continue;
         }
 
-        if (autoMinting.value && autoMinting.next) {
+        if (autoMinting.autoMinting && autoMinting.next) {
+            console.log('auto-minting in');
             const now = Date.now();
             const waitMs = autoMinting.next - now;
             if (waitMs > 60 * 1000) { // If wait time is more than 1 minute
@@ -24,8 +46,9 @@ async function main() {
                 continue;
             } else {
                 console.log(`Waiting for ${waitMs / 1000} seconds until next mint...`);
-                await new Promise(resolve => setTimeout(resolve, waitMs)); // Wait until the next mint time
-                await mintNow();
+                await sleep(waitMs, signal);
+                if (signal?.aborted) break;
+                await mintNow(true);
             }
         }
     }
@@ -39,6 +62,7 @@ export async function mintNow() {
         process.env.PUBLIC_COMETH_API_KEY,
         process.env.ENCRYPT_SECRET
     );
+    mainWindow?.webContents?.send('mint-status', { isMinting: true });
     try {
         const db = store.get('db');
         const secret = store.get('uiSecret');
@@ -54,8 +78,18 @@ export async function mintNow() {
             console.log('Minting with private key :', privateKey);
             await mint(privateKey);
         }
+
+        const autoMinting = store.get('auto-minting');
+        if (autoMinting && autoMinting.autoMinting) {
+            console.log('Auto-minting is on, setting next one in 24h');
+            const newAM = { autoMinting: true, next: Date.now() + 24 * 60 * 60 * 1000 };
+            store.set('auto-minting', newAM);
+            mainWindow?.webContents?.send('auto-mint-status', newAM);
+        }
+        mainWindow?.webContents?.send('mint-status', { isMinting: false, tx: 'done' });
         return true;
     } catch (error) {
+        mainWindow?.webContents?.send('mint-status', { isMinting: false, error: String(error) });
         console.error('An error occurred during the minting process:', error);
         return false;
     }
@@ -123,4 +157,20 @@ async function mint(PRIVATE_KEY) {
         }
     }
 
+}
+
+
+function sleep(ms, signal) {
+  return new Promise((resolve) => {
+    if (signal?.aborted) return resolve();
+    const t = setTimeout(() => resolve(), ms);
+    if (signal) {
+      const onAbort = () => {
+        clearTimeout(t);
+        signal.removeEventListener('abort', onAbort);
+        resolve();
+      };
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+  });
 }

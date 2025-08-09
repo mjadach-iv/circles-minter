@@ -10,8 +10,9 @@ declare global {
             setAutostart: (value: boolean) => Promise<boolean>;
             getAutostart: () => Promise<boolean>;
             mintNow: () => Promise<void>;
-            setAutoMinting: (value: boolean) => Promise<boolean>;
-            getAutoMinting: () => Promise<boolean>;
+            setAutoMinting: (value: boolean) => Promise<{ autoMinting: boolean, next: number}>;
+            getAutoMinting: () => Promise<{ autoMinting: boolean, next: number}>;
+            addMintStatusListener: (callback: (event: any, data: any) => void) => () => void;
         };
     }
 }

@@ -7,7 +7,8 @@ import path from 'path';
 import { menuTemplate } from './menuTemplate.js';
 import { registerIpcHandlers } from './ipc.js';
 import { powerMonitor } from 'electron';
-import { mintNow } from './circles/index.js';
+import { startMintLoop, stopMintLoop,  mintNow } from './circles/index.js';
+
 
 const isDev = process.env.NODE_ENV === "development";
 const LAUNCHED_BY_LAUNCHAGENT = process.env.LAUNCHED_BY_LAUNCHAGENT === "1";
@@ -28,7 +29,7 @@ if (firstStart === undefined && !isDev) {
     store.set('first-start', true);
     console.log('First start detected, setting first-start flag to true');
 }
-let mainWindow = null;
+export let mainWindow = null;
 let displayWindow = isDev || !firstStart;
 
 
@@ -122,9 +123,16 @@ app.whenReady().then(() => {
 
     registerIpcHandlers();
 
+    // Restart on wake (and stop on suspend for a clean restart)
+    startMintLoop();
+    powerMonitor.on('suspend', () => {
+        console.log('System going to sleep...');
+        stopMintLoop();
+    });
     powerMonitor.on('resume', () => {
         console.log('System woke up from sleep!');
-        app.wokeUpFromSleep = true;
+        stopMintLoop();
+        startMintLoop();
     });
 
     // Prevent default close button behavior: hide window instead of quitting
@@ -150,7 +158,6 @@ app.whenReady().then(() => {
             {
                 label: 'Mint now',
                 click: async () => {
-                    console.log('Minting now:');
                     const rez = await mintNow();
                     return rez;
                 }

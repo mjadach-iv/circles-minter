@@ -1,5 +1,5 @@
-import { Button } from "@heroui/react";
-import {CircularProgress} from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
+import { CircularProgress } from "@heroui/react";
 import DefaultLayout from "../layouts/default";
 import Clock from "../components/clock";
 import AccountCard from "../components/cardAccount";
@@ -8,9 +8,16 @@ import { Link } from "react-router-dom";
 import { type Address } from "../types";
 
 export default function IndexPage() {
-  const automaticMinting = useStore((state) => state.automaticMinting);
-  const { profiles, loadingApp, isMinting } = useStore();
+  const {
+    profiles,
+    loadingApp,
+    isMinting,
+    automaticMinting,
+    nextAutoMint,
+    totalMintable
+  } = useStore();
   const profilesOwners = Object.keys(profiles);
+  const canMint = totalMintable > 0;
 
   const areThereProfiles = () => {
     for (const ownerAddress of profilesOwners) {
@@ -38,12 +45,14 @@ export default function IndexPage() {
                 ?
                 'Time till next mint:'
                 :
-                'New CRC in:'
+                'New mintable CRC in:'
           }
         </p>
 
         <Clock
+          key={`just-rerender-${automaticMinting}-${nextAutoMint}`}
           aroundAnimation={isMinting}
+          countdownTo={automaticMinting ? nextAutoMint : undefined}
         />
         {
           loadingApp ? (
@@ -55,51 +64,81 @@ export default function IndexPage() {
               <p className="text-default-500 text-center mt-8">Loading...</p>
             </div>
           )
-          :
-          thereAreProfiles ?
-          <>
-            <div
-              className="flex items-center justify-between"
-              style={{ width: '100%', maxWidth: '500px', margin: '16px auto 32px' }}
-            >
-              <Button
-                size="md"
-              >
-                Start Automatic Minting
-              </Button>
-              <Button
-                size="md"
-              >
-                Mint Now
-              </Button>
-            </div>
-            <Accounts />
-          </>
-          :
-            <div
-              className="flex flex-col items-center justify-center"
-            >
-              <p className="text-default-500 text-center mt-20">No Circles accounts found.</p>
-              <Link
-                to="/accounts?add=true"
-                className="text-default-500 text-center mt-2"
-              >
-                <Button
-                  size="md"
-                  className="mt-4"
+            :
+            thereAreProfiles ?
+              <>
+                <div
+                  className="flex items-center justify-between"
+                  style={{ width: '100%', maxWidth: '500px', margin: '16px auto 32px' }}
                 >
-                  Add an account
-                </Button>
-              </Link>
-            </div>
+                  {
+                    automaticMinting ?
+                      <Button
+                        size="md"
+                        onPress={() => useStore.getState().setAutoMinting(false)}
+                      >
+                        Stop Automatic Minting
+                      </Button>
+                      :
+                      <Button
+                        size="md"
+                        onPress={() => useStore.getState().setAutoMinting(true)}
+                      >
+                        Start Automatic Minting
+                      </Button>
+                  }
+                  {
+                    canMint ?
+                      <Button
+                        size="md"
+                        onPress={() => useStore.getState().mintNow()}
+                        style={{
+                          width: '100px'
+                        }}
+                        isLoading={isMinting}
+                      >
+                        {isMinting ? 'Minting' : 'Mint now'}
+                      </Button>
+                      :
+                      <Tooltip 
+                        content="No CRC to mint"
+                        placement='bottom'
+                      >
+                        <span>
+                        <Button
+                          size="md"
+                          style={{
+                            width: '100px'
+                          }}
+                          isDisabled={true}
+                        >
+                          Mint now
+                        </Button>
+                        </span>
+                      </Tooltip>
+                  }
+                </div>
+                <Accounts />
+              </>
+              :
+              <div
+                className="flex flex-col items-center justify-center"
+              >
+                <p className="text-default-500 text-center mt-20">No Circles accounts found.</p>
+                <Link
+                  to="/accounts?add=true"
+                  className="text-default-500 text-center mt-2"
+                >
+                  <Button
+                    size="md"
+                    className="mt-4"
+                  >
+                    Add an account
+                  </Button>
+                </Link>
+              </div>
         }
       </div>
-      <Button
-        size="md"
-        onClick={() => useStore.getState().mintNow()}
-      >
-        Mint Now
-      </Button>
     </DefaultLayout>
   );
 }

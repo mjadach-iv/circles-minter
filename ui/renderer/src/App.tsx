@@ -10,9 +10,11 @@ import SettingsPage from "./pages/settings";
 
 function App() {
   const loadDB = useStore((state) => state.loadDB);
+  const getAutoMinting = useStore((state) => state.getAutoMinting);
 
   useEffect(() => {
     loadDB();
+    getAutoMinting();
   }, [])
 
   useEffect(() => {

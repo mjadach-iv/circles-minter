@@ -74,7 +74,7 @@ function Colon({ on = true }: { on?: boolean }) {
 }
 
 type ClockProps = {
-    countdownTo?: Date;
+    countdownTo?: Date | number;
     noTime?: boolean;
     aroundAnimation?: boolean;
 };
@@ -136,13 +136,18 @@ export default function Clock(props: ClockProps) {
         return diff > 0 ? diff : 0;
     });
     useEffect(() => {
-        const id = setInterval(() => {
+        const countdown = () => {
             const now = new Date();
             const nextHour = new Date(now);
             nextHour.setHours(now.getMinutes() === 0 && now.getSeconds() === 0 ? now.getHours() : now.getHours() + 1, 0, 0, 0);
-            const countdownTo = props.countdownTo || nextHour;
+            const countdownToDate = props.countdownTo instanceof Date ? props.countdownTo : new Date(props.countdownTo);
+            const countdownTo = props.countdownTo && countdownToDate || nextHour;
             const diff = countdownTo.getTime() - now.getTime();
             setTimeLeft(diff > 0 ? diff : 0);
+        }
+        countdown();
+        const id = setInterval(() => {
+            countdown();
         }, 1000);
         return () => clearInterval(id);
     }, [props.countdownTo]);

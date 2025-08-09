@@ -45,11 +45,15 @@ interface StoreState {
             isFetching: boolean;
         };
     };
+    totalMintable: number;
+    setTotalMintable: (value: number) => void;
     avatars: {
         [profileAddress: Address]: Avatar;
     }
+    setIsMinting: (value: boolean) => void;
     isMinting: boolean;
     automaticMinting: boolean;
+    nextAutoMint: number | null;
     mintableAmounts: {
         [profileAddress: Address]: string | null;
     };
@@ -63,6 +67,8 @@ interface StoreState {
     getTotalBalance: (ownerAddress: Address) => Promise<void>;
     mintNow: () => Promise<void>;
     loadDB: () => {},
+    setAutoMinting: (value: boolean) => Promise<{ autoMinting: boolean, next: number }>;
+    getAutoMinting: () => { autoMinting: boolean, next: number };
 }
 
 
@@ -72,8 +78,13 @@ export const useStore = create<StoreState>()(
         accounts: [],
         profiles: {},
         balances: {},
+        totalMintable: 0,
+        setTotalMintable: (value: number) => {
+            set(() => ({ totalMintable: value }), false, 'setTotalMintable');
+        },
         isMinting: false,
         automaticMinting: false,
+        nextAutoMint: null,
         mintableAmounts: {},
         addAccount: async (name: string, privateKey: Address) => {
             const account = privateKeyToAccount(privateKey as Address);
@@ -127,52 +138,71 @@ export const useStore = create<StoreState>()(
                 }
             }), false, 'addProfiles');
         },
+        setIsMinting: (value: boolean) => {
+            set(() => ({ isMinting: value }), false, 'setIsMinting');
+        },
         mintNow: async () => {
-            set(() => ({ isMinting: true }), false, 'mintNow');
             const result = await window.electronAPI.mintNow();
-            set(() => ({ isMinting: false }), false, 'mintNow');
             return result;
         },
         getTotalBalance: async (profileAddress: Address) => {
-            set((state) => ({
-                balances: {
-                    ...state.balances,
-                    [profileAddress]: {
-                        balance: state.balances?.[profileAddress]?.balance || null,
-                        mintable: state.balances?.[profileAddress]?.mintable || null,
-                        isFetching: true
+            const isFetching = get().balances[profileAddress]?.isFetching;
+            if (isFetching) {
+                console.log('Already fetching balance for', profileAddress);
+                return;
+            }
+            try {
+                set((state) => ({
+                    balances: {
+                        ...state.balances,
+                        [profileAddress]: {
+                            balance: state.balances?.[profileAddress]?.balance || null,
+                            mintable: state.balances?.[profileAddress]?.mintable || null,
+                            isFetching: true
+                        }
                     }
-                }
-            }), false, 'setTotalBalance');
+                }), false, 'setTotalBalanceFetching');
 
-            //Manual
-            // const rez = await fetch(chainConfig.circlesRpcUrl, {
-            //     "headers": {
-            //         "content-type": "application/json",
-            //     },
-            //     "body": `{\"jsonrpc\":\"2.0\",\"id\":${Math.random()},\"method\":\"circlesV2_getTotalBalance\",\"params\":[\"${profileAddress}\",true]}`,
-            //     "method": "POST",
-            // });
-            // const json = await rez.json();
-            // console.log(`Total balance for ${profileAddress}:`, json);
+                //Manual
+                // const rez = await fetch(chainConfig.circlesRpcUrl, {
+                //     "headers": {
+                //         "content-type": "application/json",
+                //     },
+                //     "body": `{\"jsonrpc\":\"2.0\",\"id\":${Math.random()},\"method\":\"circlesV2_getTotalBalance\",\"params\":[\"${profileAddress}\",true]}`,
+                //     "method": "POST",
+                // });
+                // const json = await rez.json();
+                // console.log(`Total balance for ${profileAddress}:`, json);
 
-            const avatar = get().avatars[profileAddress];
-            const balance = await avatar.getTotalBalance();
-            const mintableAmount = await avatar.getMintableAmount();
-            const mintable = mintableAmount - mintableAmount * (0.0833288 * 3 / 2);
-            console.log(`Total balance for ${profileAddress}:`, balance);
-            console.log(`Mintable amount for ${profileAddress}:`, mintableAmount, mintable);
+                const avatar = get().avatars[profileAddress];
+                const balance = await avatar.getTotalBalance();
+                const mintableAmount = await avatar.getMintableAmount();
+                const mintable = mintableAmount - mintableAmount * (0.0833288 * 3 / 2);
+                console.log(`Total balance for ${profileAddress}:`, balance);
+                console.log(`Mintable amount for ${profileAddress}:`, mintableAmount, mintable);
 
-            set((state) => ({
-                balances: {
-                    ...state.balances,
-                    [profileAddress]: {
-                        balance: balance || null,
-                        mintable,
-                        isFetching: false
+                set((state) => ({
+                    balances: {
+                        ...state.balances,
+                        [profileAddress]: {
+                            balance: balance || null,
+                            mintable,
+                            isFetching: false
+                        }
                     }
-                }
-            }), false, 'setTotalBalance');
+                }), false, 'setTotalBalance');
+            }catch (error) {
+                console.error(`Error fetching total balance for ${profileAddress}:`, error);
+                set((state) => ({
+                    balances: {
+                        ...state.balances,
+                        [profileAddress]: {
+                            ...state.balances[profileAddress],
+                            isFetching: false
+                        }
+                    }
+                }), false, 'setTotalBalanceFetching');
+            }
         },
         loadDB: async () => {
             try {
@@ -202,7 +232,24 @@ export const useStore = create<StoreState>()(
                 console.error('Error loading database:', error);
             }
         },
-
+        setAutoMinting: async (value) => {
+            const result = await window.electronAPI.setAutoMinting(value);
+            console.log('Automatic minting set:', result);
+            set(() => ({
+                automaticMinting: result.autoMinting,
+                nextAutoMint: result.next
+            }), false, 'setAutoMinting');
+            return result;
+        },
+        getAutoMinting: async () => {
+            const result = await window.electronAPI.getAutoMinting();
+            console.log('Automatic minting status:', result);
+            set(() => ({
+                automaticMinting: result.autoMinting,
+                nextAutoMint: result.next
+            }), false, 'getAutoMinting');
+            return result;
+        }
     }))
 );
 

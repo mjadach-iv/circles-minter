@@ -3,7 +3,6 @@ import Store from 'electron-store';
 import { decryptJson, encryptJson, generateSecret } from './functions.js';
 import { addToLaunchAgents, removeFromLaunchAgents, isInLaunchAgents } from './addToLaunchAgents.js';
 import { mintNow } from './circles/index.js';
-import { powerMonitor } from 'electron';
 
 const store = new Store();
 export function registerIpcHandlers() {
@@ -87,19 +86,20 @@ export function registerIpcHandlers() {
         return !!settings.openAtLogin;
     });
 
-    ipcMain.handle('auto-minting', (event, value) => {
-        const next = Date.now() + 24 * 60 * 60 * 1000; // Set to 24 hours in the future
-        console.log('Setting auto-minting:', value);
-        store.set('auto-minting', { value, next });
-        return { value, next };
+    ipcMain.handle('set-auto-minting', (event, autoMinting) => {
+        //const next = Date.now() + 24 * 60 * 60 * 1000;
+        const next = Date.now() + 20 * 1000;
+        console.log('Setting auto-minting:', autoMinting);
+        store.set('auto-minting', { autoMinting, next });
+        return { autoMinting, next };
     });
 
-    ipcMain.handle('get-auto-minting', (event) => {        
-        return store.get('auto-minting');
+    ipcMain.handle('get-auto-minting', (event) => {      
+        const stored = store.get('auto-minting');
+        return stored || { autoMinting: false, next: Date.now() }; 
     });
 
     ipcMain.handle('mint-now', async (event) => {
-        console.log('Minting now:');
         const rez = await mintNow();
         return rez;
     });
